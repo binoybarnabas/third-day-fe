@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google"; // Import the fonts used in your original HTML
 import "./globals.css";
 import { AppProviders } from "@/components/providers/app-providers";
+import { HeaderFooterLayout } from "@/components/ui/HeaderFooterLayout";
+import { HomeHeaderFooterLayout } from "@/components/providers/HomeHeaderFooterLayout";
 
 // 1. Define custom fonts using Next.js Font Optimization (replacing <link> tags)
 const spaceGrotesk = Space_Grotesk({
@@ -60,6 +62,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     // Set lang and custom class for font variables
     <html lang="en">
@@ -69,7 +72,9 @@ export default function RootLayout({
         // but Next.js handles most viewport settings automatically.
       >
         <AppProviders>
-          {children}
+          <HomeHeaderFooterLayout>
+            {children}
+          </HomeHeaderFooterLayout>
         </AppProviders>
       </body>
     </html>

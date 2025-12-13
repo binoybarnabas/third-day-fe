@@ -1,5 +1,4 @@
 "use client";
-import { Layout } from "@/components/ui/layout";
 import { ProductCard } from "@/components/ui/product-card";
 import { useQuery } from "@tanstack/react-query";
 import * as api from "@/lib/api";
@@ -20,7 +19,6 @@ export default function Wishlist() {
   const wishlistProducts = allProducts.filter(p => items.includes(p.id));
 
   return (
-    <Layout>
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-3xl font-heading font-bold uppercase tracking-tight mb-8">
           My Wishlist ({items.length})
@@ -52,6 +50,5 @@ export default function Wishlist() {
           </div>
         )}
       </div>
-    </Layout>
   );
 }

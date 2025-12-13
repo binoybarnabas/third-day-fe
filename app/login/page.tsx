@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Layout } from "@/components/ui/layout";
 import { Button } from "@/components/common/button";
 import { Input } from "@/components/common/input";
 import { Label } from "@/components/common/label";
@@ -425,7 +424,6 @@ export default function AuthPage() {
   // --- Logged In View ---
   if (isLoggedIn) {
     return (
-      <Layout>
         <div className="container mx-auto px-4 py-8 md:py-12">
           <div className="flex flex-col md:flex-row gap-8">
 
@@ -500,13 +498,11 @@ export default function AuthPage() {
 
           </div>
         </div>
-      </Layout>
     );
   }
 
   // --- Guest / Login View ---
   return (
-    <Layout>
       <div className="container mx-auto px-4 py-24 flex justify-center">
         <Tabs defaultValue="login" className="w-[450px]" onValueChange={resetFlows}>
           <TabsList className="grid w-full grid-cols-2 mb-8">
@@ -763,6 +759,5 @@ export default function AuthPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
   );
 }

@@ -3,7 +3,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AppRoutes, ToastVariant } from "@/types/enums";
-import { Layout } from "@/components/ui/layout";
 import { useQuery } from "@tanstack/react-query";
 import * as api from "@/lib/api";
 import { Button } from "@/components/common/button";
@@ -41,7 +40,6 @@ export default function ProductDetail() {
 
   if (isLoading) {
     return (
-      <Layout>
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
             <div className="space-y-4">
@@ -57,18 +55,16 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
-      </Layout>
+
     );
   }
 
   if (!product) {
     return (
-      <Layout>
         <div className="container mx-auto px-4 py-24 text-center">
           <h1 className="text-2xl font-bold uppercase mb-4">Product Not Found</h1>
           <Button asChild variant="outline"><Link href={AppRoutes.HOME}>Return Home</Link></Button>
         </div>
-      </Layout>
     );
   }
 
@@ -96,7 +92,6 @@ export default function ProductDetail() {
   };
 
   return (
-    <Layout>
       <div className="container mx-auto px-4 py-8">
         <Button variant="ghost" className="mb-6 pl-0 hover:bg-transparent hover:text-muted-foreground" asChild>
           <Link href={AppRoutes.HOME} className="flex items-center gap-2">
@@ -250,6 +245,5 @@ export default function ProductDetail() {
           <RelatedProducts currentProductId={product.id} category={product.category} />
         </div>
       </div>
-    </Layout>
   );
 }

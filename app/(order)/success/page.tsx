@@ -1,4 +1,3 @@
-import { Layout } from "@/components/ui/layout";
 import { Button } from "@/components/common/button";
 import { CheckCircle2 } from "lucide-react";
 import { AppRoutes } from "@/types/enums";
@@ -6,7 +5,6 @@ import Link from "next/link";
 
 export default function Success() {
   return (
-    <Layout>
       <div className="container mx-auto px-4 py-24 text-center">
         <div className="flex justify-center mb-6">
           <CheckCircle2 className="w-24 h-24 text-green-500" />
@@ -26,6 +24,5 @@ export default function Success() {
           </Button>
         </div>
       </div>
-    </Layout>
   );
 }

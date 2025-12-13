@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { Layout } from "@/components/ui/layout";
 import { useCart } from "@/lib/cart";
 import * as api from "@/lib/api";
 import { Button } from "@/components/common/button";
@@ -78,12 +77,10 @@ export default function Checkout() {
 
   if (items.length === 0) {
     return (
-      <Layout>
         <div className="container mx-auto px-4 py-24 text-center">
           <h1 className="text-2xl font-bold uppercase mb-4">Your Cart is Empty</h1>
           <Button asChild variant="outline"><Link href={AppRoutes.HOME}>Start Shopping</Link></Button>
         </div>
-      </Layout>
     );
   }
 

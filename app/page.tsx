@@ -1,5 +1,4 @@
 "use client";
-import { Layout } from "@/components/ui/layout";
 import { Button } from "@/components/common/button";
 import Link from "next/link";
 import { AppRoutes } from "@/types/enums";
@@ -24,8 +23,7 @@ export default function Home() {
   const newArrivals = products.filter(p => p.newArrival).slice(0, 4);
 
   return (
-    <Layout>
-      {/* Hero Section */}
+      <div>
       <section className="relative h-[90vh] w-full overflow-hidden">
         <Image
           src={heroImage}
@@ -176,6 +174,6 @@ export default function Home() {
           </div>
         )}
       </section>
-    </Layout>
+    </div>
   );
 }

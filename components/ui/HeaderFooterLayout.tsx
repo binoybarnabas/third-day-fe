@@ -11,7 +11,7 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/common/sheet";
 import { AppRoutes } from "@/types/enums";
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function HeaderFooterLayout({ children }: { children: React.ReactNode }) {
   const { cartCount, setIsCartOpen } = useCart();
   const { items: wishlistItems } = useWishlist();
   const [location] = usePathname();

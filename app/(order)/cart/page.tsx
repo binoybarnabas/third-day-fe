@@ -1,5 +1,4 @@
 "use client";
-import { Layout } from "@/components/ui/layout";
 import { useCart } from "@/lib/cart";
 import { Button } from "@/components/common/button";
 import { AppRoutes } from "@/types/enums";
@@ -12,7 +11,6 @@ export default function CartPage() {
 
     if (items.length === 0) {
         return (
-            <Layout>
                 <div className="container mx-auto px-4 py-24 text-center">
                     <h1 className="text-3xl font-heading font-bold uppercase tracking-tight mb-4">Your Cart is Empty</h1>
                     <p className="text-muted-foreground mb-8">Looks like you haven't added anything to your cart yet.</p>
@@ -20,12 +18,10 @@ export default function CartPage() {
                         <Link href={AppRoutes.HOME}>Start Shopping</Link>
                     </Button>
                 </div>
-            </Layout>
         );
     }
 
     return (
-        <Layout>
             <div className="container mx-auto px-4 py-12">
                 <h1 className="text-3xl font-heading font-bold uppercase tracking-tight mb-8">
                     Shopping Cart ({items.length})
@@ -127,6 +123,5 @@ export default function CartPage() {
                     </div>
                 </div>
             </div>
-        </Layout>
     );
 }
