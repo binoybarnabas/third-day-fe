@@ -32,6 +32,7 @@ export enum AppRoutes {
     TERMS = '/terms',
     ADMIN_DASHBOARD = '/admin',
     ADMIN_PRODUCTS = '/admin/products',
+    ADMIN_VENDORS = '/admin/vendors',
     ADMIN_ORDERS = '/admin/orders',
     ADMIN_CUSTOMERS = '/admin/customers',
     ADMIN_SETTINGS = '/admin/settings',
