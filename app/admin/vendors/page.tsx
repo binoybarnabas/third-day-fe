@@ -28,23 +28,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/common/select";
-import { dummyVendors } from "@/lib/dummyData";
-import {
-  Search,
-  Eye,
-  Store,
-  Mail,
-  Phone,
-  MapPin,
-  Plus,
-  Loader2,
-  ShieldCheck,
+import { 
+  Search, Eye, Store, Mail, Phone, MapPin, Plus, Loader2 
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PaginationControl } from "@/components/common/pagination-control";
 import { Badge } from "@/components/common/badge";
 import { Separator } from "@/components/common/separator";
 import { ToastVariant } from "@/types/enums";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+// API helpers
+import { get, post, put } from "@/utils/api";
 
 enum VendorStatus {
   ACTIVE = "ACTIVE",
@@ -54,16 +49,15 @@ enum VendorStatus {
 }
 
 export default function VendorManagement() {
-  const [vendors, setVendors] = useState<any[]>(dummyVendors);
-  const [searchQuery, setSearchQuery] = useState("");
+  const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [selectedVendor, setSelectedVendor] = useState<any | null>(null);
 
-  // --- ADD VENDOR STATES ---
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(7);
+  const [selectedVendor, setSelectedVendor] = useState<any | null>(null);
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+
   const [newVendorData, setNewVendorData] = useState({
     businessName: "",
     ownerName: "",
@@ -73,63 +67,58 @@ export default function VendorManagement() {
     status: VendorStatus.PENDING,
   });
 
+  // --- API CALLS ---
+
+  // 1. Fetch Vendors with Pagination & Search Query Params
+  const { data: vendorResponse, isLoading } = useQuery({
+    queryKey: ["vendors", currentPage, itemsPerPage, searchQuery],
+    queryFn: () => get<any>(`/vendors?page=${currentPage}&limit=${itemsPerPage}&search=${searchQuery}`),
+  });
+
+  const vendors = vendorResponse?.data?.vendors || [];
+  const totalItems = vendorResponse?.data?.meta?.totalItems || 0;
+
+  // 2. Add Vendor Mutation
+  const addMutation = useMutation({
+    mutationFn: (data: typeof newVendorData) => post("/vendors", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vendors"] });
+      setIsAddSheetOpen(false);
+      toast({ title: "Success", description: "Vendor added successfully." });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to add vendor",
+        variant: ToastVariant.DESTRUCTIVE,
+      });
+    }
+  });
+
+  // 3. Update Status Mutation
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: number; status: VendorStatus }) => 
+      put(`/vendors/${id}/status`, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vendors"] });
+      toast({ title: "Status Updated", description: "Vendor status synchronized." });
+    }
+  });
+
+  // Reset Add Form
   useEffect(() => {
     if (!isAddSheetOpen) {
       setNewVendorData({
-        businessName: "",
-        ownerName: "",
-        email: "",
-        phone: "",
-        address: "",
-        status: VendorStatus.PENDING,
+        businessName: "", ownerName: "", email: "", phone: "", address: "", status: VendorStatus.PENDING,
       });
     }
   }, [isAddSheetOpen]);
 
-  const filteredVendors = vendors.filter(
-    (v) =>
-      v.businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.ownerName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const paginatedVendors = filteredVendors.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const handleAddVendor = async () => {
-    if (!newVendorData.businessName || !newVendorData.email || !newVendorData.ownerName) {
-      toast({
-        title: "Required Fields Missing",
-        description: "Please fill in Business Name, Owner, and Email.",
-        variant: ToastVariant.DESTRUCTIVE,
-      });
-      return;
-    }
-    setIsSaving(true);
-    setTimeout(() => {
-      const newEntry = {
-        ...newVendorData,
-        id: vendors.length + 1,
-        productCount: 0,
-        createdAt: new Date().toISOString(),
-        totalSales: "0.00",
-        commission: "10",
-      };
-      setVendors([newEntry, ...vendors]);
-      setIsSaving(false);
-      setIsAddSheetOpen(false);
-      toast({ title: "Vendor Registered", description: "Account created successfully." });
-    }, 800);
-  };
-
   const handleStatusChange = (vendorId: number, newStatus: VendorStatus) => {
-    setVendors(vendors.map((v) => (v.id === vendorId ? { ...v, status: newStatus } : v)));
+    statusMutation.mutate({ id: vendorId, status: newStatus });
     if (selectedVendor && selectedVendor.id === vendorId) {
       setSelectedVendor({ ...selectedVendor, status: newStatus });
     }
-    toast({ title: "Status Updated", description: `Vendor is now ${newStatus}.` });
   };
 
   const getStatusColor = (status: VendorStatus) => {
@@ -144,19 +133,24 @@ export default function VendorManagement() {
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 py-8">
-        {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-heading font-bold uppercase tracking-tight mb-2">Vendor Management</h1>
-            <p className="text-muted-foreground">Manage your marketplace sellers ({vendors.length} vendors)</p>
+            <p className="text-muted-foreground">Manage marketplace sellers</p>
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto">
             <div className="relative flex-1 md:w-64">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search vendors..." className="pl-8" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+              <Input 
+                placeholder="Search vendors..." 
+                className="pl-8" 
+                value={searchQuery} 
+                onChange={(e) => setSearchQuery(e.target.value)} 
+              />
             </div>
 
+            {/* ADD VENDOR SHEET */}
             <Sheet open={isAddSheetOpen} onOpenChange={setIsAddSheetOpen}>
               <SheetTrigger asChild>
                 <Button className="uppercase tracking-widest font-bold rounded-none gap-2">
@@ -193,8 +187,8 @@ export default function VendorManagement() {
                   </div>
                 </div>
                 <SheetFooter>
-                  <Button className="w-full" onClick={handleAddVendor} disabled={isSaving}>
-                    {isSaving && <Loader2 className="w-4 h-4 animate-spin mr-2" />} Save Vendor
+                  <Button className="w-full" onClick={() => addMutation.mutate(newVendorData)} disabled={addMutation.isPending}>
+                    {addMutation.isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />} Save Vendor
                   </Button>
                 </SheetFooter>
               </SheetContent>
@@ -209,21 +203,21 @@ export default function VendorManagement() {
               <TableRow>
                 <TableHead>Vendor ID</TableHead>
                 <TableHead>Business Details</TableHead>
-                <TableHead>Join Date</TableHead>
                 <TableHead>Products</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedVendors.map((vendor) => (
+              {isLoading ? (
+                <TableRow><TableCell colSpan={5} className="text-center py-10"><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
+              ) : vendors.map((vendor: any) => (
                 <TableRow key={vendor.id}>
                   <TableCell className="font-medium">VND-{vendor.id}</TableCell>
                   <TableCell>
                     <div className="font-bold">{vendor.businessName}</div>
                     <div className="text-xs text-muted-foreground">{vendor.ownerName} • {vendor.email}</div>
                   </TableCell>
-                  <TableCell>{new Date(vendor.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>{vendor.productCount || 0} items</TableCell>
                   <TableCell><Badge className={getStatusColor(vendor.status)}>{vendor.status}</Badge></TableCell>
                   <TableCell className="text-right">
@@ -296,7 +290,14 @@ export default function VendorManagement() {
           </Table>
         </div>
 
-        <PaginationControl currentPage={currentPage} totalPages={Math.ceil(filteredVendors.length / itemsPerPage)} onPageChange={setCurrentPage} itemsPerPage={itemsPerPage} onItemsPerPageChange={setItemsPerPage} totalItems={filteredVendors.length} />
+        <PaginationControl 
+          currentPage={currentPage} 
+          totalPages={Math.ceil(totalItems / itemsPerPage)} 
+          onPageChange={setCurrentPage} 
+          itemsPerPage={itemsPerPage} 
+          onItemsPerPageChange={setItemsPerPage} 
+          totalItems={totalItems} 
+        />
       </div>
     </AdminLayout>
   );
