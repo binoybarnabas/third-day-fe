@@ -694,3 +694,58 @@ export const dummyOrders: Order[] = [
         createdAt: "2023-10-25T16:20:00Z"
     }
 ];
+
+export const dummyVendors = [
+  {
+    id: 1,
+    businessName: "TechNova Solutions",
+    ownerName: "John Doe",
+    email: "contact@technova.com",
+    phone: "+1 234 567 890",
+    address: "123 Silicon Valley, CA",
+    status: "ACTIVE",
+    productCount: 45,
+    totalSales: 12450.50,
+    commission: 12,
+    createdAt: "2024-01-15T10:00:00Z"
+  },
+  {
+    id: 2,
+    businessName: "EcoLeaf Organics",
+    ownerName: "Sarah Jenkins",
+    email: "supply@ecoleaf.io",
+    phone: "+1 415 888 2323",
+    address: "782 Green St, Portland, OR 97201",
+    status: "ACTIVE",
+    productCount: 128,
+    totalSales: 45200.00,
+    commission: 10,
+    createdAt: "2024-03-12T08:30:00Z"
+  },
+  {
+    id: 3,
+    businessName: "Midnight Apparel",
+    ownerName: "Marcus Vane",
+    email: "marcus@midnight.co",
+    phone: "+1 212 555 0198",
+    address: "440 Fashion Ave, New York, NY 10018",
+    status: "PENDING",
+    productCount: 12,
+    totalSales: 0.00,
+    commission: 15,
+    createdAt: "2025-05-20T14:15:00Z"
+  },
+  {
+    id: 4,
+    businessName: "Apex Electronics",
+    ownerName: "Chen Wei",
+    email: "support@apexelectro.net",
+    phone: "+1 310 444 9922",
+    address: "900 Tech Hub Dr, Austin, TX 73301",
+    status: "SUSPENDED",
+    productCount: 310,
+    totalSales: 89320.75,
+    commission: 8,
+    createdAt: "2023-11-05T11:45:00Z"
+  }
+];
