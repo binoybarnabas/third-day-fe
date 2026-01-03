@@ -1,5 +1,5 @@
 import { Product } from './api';
-import { ProductCategory, ProductSubCategory, ProductGender, OrderStatus, ProductSize, ProductStatus } from '@/types/enums';
+import { ProductCategory, ProductSubCategory, ProductGender, OrderStatus, ProductSize } from '@/types/enums';
 
 // Dummy product data for streetwear clothing store
 export const dummyProducts: Product[] = [
@@ -21,8 +21,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Grey", "Cream"],
         stock: 45,
         newArrival: true,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 2,
@@ -40,8 +39,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Navy", "Olive"],
         stock: 32,
         newArrival: true,
-        bestSeller: false,
-        status: ProductStatus.ACTIVE
+        bestSeller: false
     },
     {
         id: 3,
@@ -59,8 +57,7 @@ export const dummyProducts: Product[] = [
         colors: ["Washed Black", "Faded Grey", "Rust"],
         stock: 18,
         newArrival: false,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
 
     // ============== MEN'S T-SHIRTS ==============
@@ -80,8 +77,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "White", "Grey", "Cream", "Navy"],
         stock: 120,
         newArrival: false,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 5,
@@ -98,8 +94,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "White"],
         stock: 25,
         newArrival: true,
-        bestSeller: false,
-        status: ProductStatus.ACTIVE
+        bestSeller: false
     },
     {
         id: 6,
@@ -116,8 +111,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Grey", "Olive"],
         stock: 38,
         newArrival: true,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
 
     // ============== MEN'S PANTS ==============
@@ -137,8 +131,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Olive", "Khaki"],
         stock: 42,
         newArrival: true,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 8,
@@ -156,8 +149,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Grey", "Navy"],
         stock: 55,
         newArrival: false,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 9,
@@ -174,8 +166,7 @@ export const dummyProducts: Product[] = [
         colors: ["Indigo", "Black", "Light Wash"],
         stock: 28,
         newArrival: true,
-        bestSeller: false,
-        status: ProductStatus.ACTIVE
+        bestSeller: false
     },
 
     // ============== MEN'S JACKETS ==============
@@ -195,8 +186,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Navy", "Olive"],
         stock: 22,
         newArrival: true,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 11,
@@ -214,8 +204,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Sage", "Burgundy"],
         stock: 15,
         newArrival: false,
-        bestSeller: false,
-        status: ProductStatus.ACTIVE
+        bestSeller: false
     },
 
     // ============== WOMEN'S HOODIES ==============
@@ -234,8 +223,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Cream", "Pink", "Grey"],
         stock: 48,
         newArrival: true,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 13,
@@ -252,8 +240,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Grey", "Lavender"],
         stock: 35,
         newArrival: true,
-        bestSeller: false,
-        status: ProductStatus.ACTIVE
+        bestSeller: false
     },
 
     // ============== WOMEN'S TOPS ==============
@@ -272,8 +259,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "White", "Cream", "Brown"],
         stock: 85,
         newArrival: false,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 15,
@@ -290,8 +276,7 @@ export const dummyProducts: Product[] = [
         colors: ["White", "Black", "Pink"],
         stock: 42,
         newArrival: true,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 16,
@@ -308,8 +293,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "White", "Grey"],
         stock: 52,
         newArrival: false,
-        bestSeller: false,
-        status: ProductStatus.ACTIVE
+        bestSeller: false
     },
 
     // ============== WOMEN'S BOTTOMS ==============
@@ -328,8 +312,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Khaki", "Olive"],
         stock: 38,
         newArrival: true,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 18,
@@ -347,8 +330,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Cream", "Grey"],
         stock: 28,
         newArrival: false,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 19,
@@ -365,8 +347,7 @@ export const dummyProducts: Product[] = [
         colors: ["Indigo", "Black", "Light Blue"],
         stock: 45,
         newArrival: true,
-        bestSeller: false,
-        status: ProductStatus.ACTIVE
+        bestSeller: false
     },
 
     // ============== WOMEN'S OUTERWEAR ==============
@@ -385,8 +366,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Cream", "Brown"],
         stock: 25,
         newArrival: true,
-        bestSeller: false,
-        status: ProductStatus.ACTIVE
+        bestSeller: false
     },
     {
         id: 21,
@@ -403,8 +383,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Brown"],
         stock: 12,
         newArrival: false,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
 
     // ============== ACCESSORIES - BAGS ==============
@@ -423,8 +402,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Cream", "Olive"],
         stock: 65,
         newArrival: false,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 23,
@@ -441,8 +419,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Grey", "Navy"],
         stock: 42,
         newArrival: true,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 24,
@@ -460,8 +437,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Grey"],
         stock: 35,
         newArrival: false,
-        bestSeller: false,
-        status: ProductStatus.ACTIVE
+        bestSeller: false
     },
 
     // ============== ACCESSORIES - HATS ==============
@@ -480,8 +456,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Grey", "Cream", "Navy"],
         stock: 95,
         newArrival: false,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 26,
@@ -498,8 +473,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "White", "Navy", "Olive"],
         stock: 78,
         newArrival: true,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 27,
@@ -516,8 +490,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Khaki", "Denim"],
         stock: 52,
         newArrival: true,
-        bestSeller: false,
-        status: ProductStatus.ACTIVE
+        bestSeller: false
     },
 
     // ============== ACCESSORIES - OTHERS ==============
@@ -536,8 +509,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Brown"],
         stock: 48,
         newArrival: false,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     },
     {
         id: 29,
@@ -554,8 +526,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "Tortoise", "Clear"],
         stock: 32,
         newArrival: true,
-        bestSeller: false,
-        status: ProductStatus.ACTIVE
+        bestSeller: false
     },
     {
         id: 30,
@@ -572,8 +543,7 @@ export const dummyProducts: Product[] = [
         colors: ["Black", "White", "Grey"],
         stock: 120,
         newArrival: false,
-        bestSeller: true,
-        status: ProductStatus.ACTIVE
+        bestSeller: true
     }
 ];
 
