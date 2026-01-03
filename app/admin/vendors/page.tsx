@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/common/select";
 import { 
-  Search, Eye, Store, Mail, Phone, MapPin, Plus, Loader2 
+  Search, Eye, Store, Mail, Phone, MapPin, Plus, Loader2, Edit3, Check 
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PaginationControl } from "@/components/common/pagination-control";
@@ -39,7 +39,7 @@ import { ToastVariant } from "@/types/enums";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // API helpers
-import { fetchVendors, addVendor, updateVendorStatus } from "@/lib/api";
+import { get, post, put } from "@/utils/api";
 
 enum VendorStatus {
   ACTIVE = "ACTIVE",
@@ -55,9 +55,13 @@ export default function VendorManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(7);
+  
+  // States for Selection and Editing
   const [selectedVendor, setSelectedVendor] = useState<any | null>(null);
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
+  // New Vendor Form State
   const [newVendorData, setNewVendorData] = useState({
     businessName: "",
     ownerName: "",
@@ -69,18 +73,18 @@ export default function VendorManagement() {
 
   // --- API CALLS ---
 
-  // 1. Fetch Vendors with Pagination & Search Query Params
+  // 1. Fetch Vendors (Paginated and Filtered)
   const { data: vendorResponse, isLoading } = useQuery({
     queryKey: ["vendors", currentPage, itemsPerPage, searchQuery],
-    queryFn: () => fetchVendors(currentPage, itemsPerPage, searchQuery),
+    queryFn: () => get<any>(`/vendors?page=${currentPage}&limit=${itemsPerPage}&search=${searchQuery}`),
   });
 
-  const vendors = vendorResponse?.vendors || [];
-  const totalItems = vendorResponse?.meta?.totalItems || 0;
+  const vendors = vendorResponse?.data?.vendors || [];
+  const totalItems = vendorResponse?.data?.meta?.totalItems || 0;
 
   // 2. Add Vendor Mutation
   const addMutation = useMutation({
-    mutationFn: (data: typeof newVendorData) => addVendor(data),
+    mutationFn: (data: typeof newVendorData) => post("/vendors", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["vendors"] });
       setIsAddSheetOpen(false);
@@ -89,23 +93,32 @@ export default function VendorManagement() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to add vendor",
+        description: error.response?.data?.message || "Failed to add vendor",
         variant: ToastVariant.DESTRUCTIVE,
       });
     }
   });
 
-  // 3. Update Status Mutation
-  const statusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: number; status: VendorStatus }) => 
-      updateVendorStatus(id, status),
+  // 3. Update Vendor Mutation (Profile & Status)
+  const updateMutation = useMutation({
+    mutationFn: (data: any) => put(`/vendors/${data.id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["vendors"] });
-      toast({ title: "Status Updated", description: "Vendor status synchronized." });
+      setIsEditMode(false);
+      toast({ title: "Success", description: "Vendor updated successfully." });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.response?.data?.message || "Could not update vendor",
+        variant: ToastVariant.DESTRUCTIVE,
+      });
     }
   });
 
-  // Reset Add Form
+  // --- HANDLERS ---
+
+  // Reset Add Form when closed
   useEffect(() => {
     if (!isAddSheetOpen) {
       setNewVendorData({
@@ -115,9 +128,15 @@ export default function VendorManagement() {
   }, [isAddSheetOpen]);
 
   const handleStatusChange = (vendorId: number, newStatus: VendorStatus) => {
-    statusMutation.mutate({ id: vendorId, status: newStatus });
-    if (selectedVendor && selectedVendor.id === vendorId) {
-      setSelectedVendor({ ...selectedVendor, status: newStatus });
+    // Immediate update for better UX, then mutation handles server sync
+    const updated = { ...selectedVendor, status: newStatus };
+    setSelectedVendor(updated);
+    updateMutation.mutate(updated);
+  };
+
+  const handleSaveChanges = () => {
+    if (selectedVendor) {
+      updateMutation.mutate(selectedVendor);
     }
   };
 
@@ -136,7 +155,7 @@ export default function VendorManagement() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-heading font-bold uppercase tracking-tight mb-2">Vendor Management</h1>
-            <p className="text-muted-foreground">Manage marketplace sellers</p>
+            <p className="text-muted-foreground">Monitor and manage seller accounts</p>
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto">
@@ -150,7 +169,6 @@ export default function VendorManagement() {
               />
             </div>
 
-            {/* ADD VENDOR SHEET */}
             <Sheet open={isAddSheetOpen} onOpenChange={setIsAddSheetOpen}>
               <SheetTrigger asChild>
                 <Button className="uppercase tracking-widest font-bold rounded-none gap-2">
@@ -160,7 +178,7 @@ export default function VendorManagement() {
               <SheetContent className="overflow-y-auto w-[400px] sm:w-[540px]">
                 <SheetHeader>
                   <SheetTitle>Add New Vendor</SheetTitle>
-                  <SheetDescription>Register a new seller account.</SheetDescription>
+                  <SheetDescription>Register a new marketplace seller account.</SheetDescription>
                 </SheetHeader>
                 <div className="grid gap-4 py-6">
                   <div className="grid gap-2">
@@ -196,7 +214,6 @@ export default function VendorManagement() {
           </div>
         </div>
 
-        {/* TABLE */}
         <div className="border rounded-md bg-card">
           <Table>
             <TableHeader>
@@ -211,30 +228,42 @@ export default function VendorManagement() {
             <TableBody>
               {isLoading ? (
                 <TableRow><TableCell colSpan={5} className="text-center py-10"><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
+              ) : vendors.length === 0 ? (
+                <TableRow><TableCell colSpan={5} className="text-center py-10 text-muted-foreground">No vendors found.</TableCell></TableRow>
               ) : vendors.map((vendor: any) => (
                 <TableRow key={vendor.id}>
-                  <TableCell className="font-medium">VND-{vendor.id}</TableCell>
+                  <TableCell className="font-medium text-xs">#VND-{vendor.id}</TableCell>
                   <TableCell>
                     <div className="font-bold">{vendor.businessName}</div>
                     <div className="text-xs text-muted-foreground">{vendor.ownerName} • {vendor.email}</div>
                   </TableCell>
-                  <TableCell>{vendor.productCount || 0} items</TableCell>
+                  <TableCell>{vendor.productCount || 0}</TableCell>
                   <TableCell><Badge className={getStatusColor(vendor.status)}>{vendor.status}</Badge></TableCell>
                   <TableCell className="text-right">
-                    <Sheet>
+                    <Sheet onOpenChange={(open) => { if(!open) setIsEditMode(false) }}>
                       <SheetTrigger asChild>
                         <Button variant="ghost" size="sm" onClick={() => setSelectedVendor(vendor)}>
                           <Eye className="w-4 h-4 mr-2" /> Manage
                         </Button>
                       </SheetTrigger>
                       <SheetContent className="overflow-y-auto w-[400px] sm:w-[540px]">
-                        <SheetHeader>
-                          <SheetTitle>Vendor Profile</SheetTitle>
-                          <SheetDescription>Review credentials and store settings.</SheetDescription>
+                        <SheetHeader className="flex flex-row items-center justify-between mr-8">
+                          <div className="flex flex-col">
+                            <SheetTitle>Vendor Profile</SheetTitle>
+                            <SheetDescription>Review or update store information.</SheetDescription>
+                          </div>
+                          <Button 
+                            variant={isEditMode ? "ghost" : "outline"} 
+                            size="sm" 
+                            onClick={() => setIsEditMode(!isEditMode)}
+                          >
+                            {isEditMode ? "Cancel" : <><Edit3 className="w-4 h-4 mr-2" /> Edit Profile</>}
+                          </Button>
                         </SheetHeader>
 
                         {selectedVendor && (
                           <div className="py-6 space-y-6">
+                            {/* --- STATUS --- */}
                             <div className="space-y-2">
                               <Label>Account Status</Label>
                               <Select value={selectedVendor.status} onValueChange={(val: any) => handleStatusChange(selectedVendor.id, val as VendorStatus)}>
@@ -243,41 +272,95 @@ export default function VendorManagement() {
                                   <SelectItem value={VendorStatus.ACTIVE}>Active / Verified</SelectItem>
                                   <SelectItem value={VendorStatus.PENDING}>Pending Review</SelectItem>
                                   <SelectItem value={VendorStatus.SUSPENDED}>Suspended</SelectItem>
+                                  <SelectItem value={VendorStatus.INACTIVE}>Inactive</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
+
                             <Separator />
+
+                            {/* --- EDITABLE FORM --- */}
                             <div className="space-y-4">
-                              <h3 className="font-semibold flex items-center gap-2"><Store className="w-4 h-4" /> Business Information</h3>
-                              <div className="bg-secondary/30 p-3 rounded-lg">
-                                <p className="text-muted-foreground text-xs uppercase font-bold">Store Name</p>
-                                <p className="text-base font-medium">{selectedVendor.businessName}</p>
-                              </div>
-                              <div className="flex items-start gap-3">
-                                <Mail className="w-4 h-4 mt-1 text-muted-foreground" />
-                                <div><p className="font-medium">{selectedVendor.email}</p><p className="text-xs text-muted-foreground">Primary Contact</p></div>
-                              </div>
-                              <div className="flex items-start gap-3">
-                                <Phone className="w-4 h-4 mt-1 text-muted-foreground" />
-                                <div><p className="font-medium">{selectedVendor.phone || "N/A"}</p></div>
-                              </div>
-                              <div className="flex items-start gap-3">
-                                <MapPin className="w-4 h-4 mt-1 text-muted-foreground" />
-                                <div><p className="text-sm">{selectedVendor.address}</p></div>
-                              </div>
+                              <h3 className="font-semibold flex items-center gap-2 uppercase tracking-wider text-xs text-muted-foreground">
+                                <Store className="w-4 h-4" /> Business Information
+                              </h3>
+                              
+                              {isEditMode ? (
+                                <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                                   <div className="grid gap-2">
+                                      <Label>Store Name</Label>
+                                      <Input 
+                                        value={selectedVendor.businessName} 
+                                        onChange={(e) => setSelectedVendor({...selectedVendor, businessName: e.target.value})}
+                                      />
+                                   </div>
+                                   <div className="grid gap-2">
+                                      <Label>Owner Name</Label>
+                                      <Input 
+                                        value={selectedVendor.ownerName} 
+                                        onChange={(e) => setSelectedVendor({...selectedVendor, ownerName: e.target.value})}
+                                      />
+                                   </div>
+                                   <div className="grid gap-2">
+                                      <Label>Phone</Label>
+                                      <Input 
+                                        value={selectedVendor.phone} 
+                                        onChange={(e) => setSelectedVendor({...selectedVendor, phone: e.target.value})}
+                                      />
+                                   </div>
+                                   <div className="grid gap-2">
+                                      <Label>Address</Label>
+                                      <Input 
+                                        value={selectedVendor.address} 
+                                        onChange={(e) => setSelectedVendor({...selectedVendor, address: e.target.value})}
+                                      />
+                                   </div>
+                                   <Button className="w-full gap-2" onClick={handleSaveChanges} disabled={updateMutation.isPending}>
+                                     {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                                     Save Changes
+                                   </Button>
+                                </div>
+                              ) : (
+                                <div className="grid gap-4">
+                                  <div className="bg-secondary/30 p-3 rounded-lg">
+                                    <p className="text-muted-foreground text-xs uppercase font-bold text-[10px]">Store Identity</p>
+                                    <p className="text-base font-medium">{selectedVendor.businessName}</p>
+                                  </div>
+                                  <div className="flex items-start gap-3">
+                                    <Mail className="w-4 h-4 mt-1 text-muted-foreground" />
+                                    <div><p className="font-medium text-sm">{selectedVendor.email}</p></div>
+                                  </div>
+                                  <div className="flex items-start gap-3">
+                                    <Phone className="w-4 h-4 mt-1 text-muted-foreground" />
+                                    <div><p className="font-medium text-sm">{selectedVendor.phone || "N/A"}</p></div>
+                                  </div>
+                                  <div className="flex items-start gap-3">
+                                    <MapPin className="w-4 h-4 mt-1 text-muted-foreground" />
+                                    <div><p className="text-sm text-muted-foreground">{selectedVendor.address}</p></div>
+                                  </div>
+                                </div>
+                              )}
                             </div>
+
                             <Separator />
-                            <div>
-                              <h3 className="font-semibold mb-3">Performance Overview</h3>
+
+                            {/* --- STATS (HIDDEN IN EDIT MODE) --- */}
+                            {!isEditMode && (
                               <div className="grid grid-cols-2 gap-4">
-                                <div className="border rounded-md p-3"><p className="text-xs text-muted-foreground">Total Sales</p><p className="text-xl font-bold">${selectedVendor.totalSales || "0.00"}</p></div>
-                                <div className="border rounded-md p-3"><p className="text-xs text-muted-foreground">Commission</p><p className="text-xl font-bold">{selectedVendor.commission || "10"}%</p></div>
+                                <div className="border rounded-md p-3">
+                                  <p className="text-[10px] text-muted-foreground uppercase">Total Sales</p>
+                                  <p className="text-lg font-bold">${selectedVendor.totalSales || "0.00"}</p>
+                                </div>
+                                <div className="border rounded-md p-3">
+                                  <p className="text-[10px] text-muted-foreground uppercase">Commission</p>
+                                  <p className="text-lg font-bold">{selectedVendor.commission || "10"}%</p>
+                                </div>
                               </div>
-                            </div>
-                            <Separator />
-                            <div className="flex flex-col gap-2">
+                            )}
+
+                            <div className="flex flex-col gap-2 pt-4">
                               <Button variant="outline" className="w-full">View Store Products</Button>
-                              <Button variant="destructive" className="w-full">Suspend Vendor Account</Button>
+                              <Button variant="destructive" className="w-full">Suspend Vendor</Button>
                             </div>
                           </div>
                         )}

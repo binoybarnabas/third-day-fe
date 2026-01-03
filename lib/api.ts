@@ -1,7 +1,7 @@
 // API client for backend communication
 import { CartData, Order, OrderItem, Stat } from '@/types/dto';
 import { dummyProducts, getProductById as getDummyProductById, dummyOrders } from './dummyData';
-import { ProductCategory, ProductSubCategory, ProductGender, OrderStatus, ProductSize, ProductStatus } from '@/types/enums';
+import { ProductCategory, ProductSubCategory, ProductGender, OrderStatus, ProductSize } from '@/types/enums';
 
 export interface Product {
   id: number;
@@ -16,7 +16,6 @@ export interface Product {
   sizes: ProductSize[];
   colors: string[];
   stock: number;
-  status?: ProductStatus;
   newArrival: boolean;
   bestSeller: boolean;
 }
@@ -400,7 +399,7 @@ export async function fetchVendors(page = 1, limit = 10, search = ""): Promise<{
         const query = search.toLowerCase();
         vendors = vendors.filter(v => 
           v.businessName.toLowerCase().includes(query) || 
-          v.ownerName.toLowerCase().includes(query) ||
+          v.ownerName.toLowerCase().includes(query) || 
           v.email.toLowerCase().includes(query)
         );
       }
