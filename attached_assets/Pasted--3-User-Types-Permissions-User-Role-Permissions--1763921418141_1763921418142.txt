@@ -1,0 +1,87 @@
+### 3. User Types & Permissions
+| User Role       | Permissions |
+|-----------------|-------------|
+| Guest           | Browse, add to cart, add to wishlist, checkout (as guest or login) |
+| Customer        | Login (Google/Phone), profile, order history, wishlist, cart, addresses, track orders |
+| Admin Level 1 (Inventory Manager) | Add/edit/delete products, manage stock, upload photos, set price/discount |
+| Admin Level 2 (Order Manager)     | View/process/cancel orders, update tracking, issue refunds |
+| Admin Level 3 (Super Admin)      | All above + view analytics, manage other admins, site settings, coupons |
+
+### 4. Website Structure & Page List
+#### Public Pages (No login required)
+1. Homepage
+2. Men → T-Shirts, Shirts, Hoodies, Joggers, Jeans, Shorts, Shoes, Accessories
+3. Women → Tops, T-Shirts, Shirts, Hoodies, Joggers, Jeans, Shorts, Shoes, Accessories
+4. Product Listing Page (PLP) – with filters
+5. Product Detail Page (PDP)
+6. Cart Page
+7. Checkout (guest + login option)
+8. About Us, Contact, FAQ, Shipping Policy, Return Policy, Privacy Policy, Terms
+
+#### Authenticated Customer Pages
+- My Account Dashboard (orders, profile, addresses, wishlist, logout)
+- Order History & Tracking
+- Wishlist / Favourites
+- Saved Addresses
+
+#### Admin Dashboard (separate /admin route, protected)
+- Login (different from customer)
+- Dashboard overview (today’s sales, orders, low stock alerts)
+- Product management (add, edit, bulk upload via CSV)
+- Order management
+- Customer management
+- Coupon / discount code management
+- Analytics & reports (sales by day/week, top products, city-wise, etc.)
+- Inventory logs
+
+### 5. Detailed User Flows
+
+#### A. New User Journey (First Purchase)
+1. Lands on homepage → browses Men/Women → clicks product → PDP
+2. Clicks “Add to Cart” → mini-cart pops up → “View Cart” or “Checkout”
+3. Checkout → “Continue as Guest” or “Login/Signup”
+4. Chooses “Sign up with Google” or “Phone OTP”
+   - Phone OTP flow: Enter phone → OTP → Auto-fill name (optional) → proceed
+5. Shipping address form (with pincode checker for delivery feasibility)
+6. Payment page → Razorpay (UPI QR, UPI ID, Cards, Wallets)
+7. Order success → Order confirmation email + SMS with tracking link
+8. Account automatically created → can see order in “My Orders”
+
+#### B. Returning User Journey
+1. Clicks “Login” top-right → Google or Phone → lands on homepage
+2. Profile icon shows name/initials
+3. Can directly go to Wishlist, Cart, My Orders
+
+#### C. Wishlist / Favourites
+- Heart icon on PLP and PDP
+- Clicking when logged in → adds to wishlist
+- Clicking when not logged in → prompts login → then adds
+
+#### D. Cart Behaviour
+- Persists even if user closes browser (saved in database for logged-in, localStorage for guest)
+- Guest cart merges with account cart after login
+
+### 6. Key Website Features & Modules
+
+| Module                  | Must-Have Features |
+|-------------------------|--------------------|
+| Product Catalog         | Category → Subcategory → Filters (size, color, price range, sort by latest/popular/price) |
+| Product Detail Page     | Multiple photos + zoom, size chart popup, color variants, size selector, “Add to Cart” + “Buy Now”, related products, recently viewed |
+| Search                 | Full-text search + auto-suggestions |
+| Filters & Sorting       | Price slider, size (S,M,L,XL,XXL), color swatches, fabric, sleeve, discount % |
+| Responsive Design       | Mobile-first (90% Indian users are mobile) | also keep it responsive for web as well
+| Checkout                | One-page checkout, COD (optional later), Razorpay integration, coupon code box |
+| Order Tracking          | After shipment, show Delhivery/Bluedart/Ecom tracking link |
+| Customer Support        | WhatsApp chat button (fixed bottom-right), Email ticketing (future), FAQ section |
+| Email & SMS             | Order confirmation, shipment, delivery, abandoned cart reminder |
+| SEO & Performance       | Next.js SSR, lazy load images, Open Graph tags, sitemap.xml |
+| Analytics               | Google Analytics 4 + Meta Pixel + Hotjar (optional) |
+
+### 7. Database Schema (High-level)
+- Users (id, name, email, phone, googleId, role)
+- Products (id, title, slug, description, price, sale_price, sku, sizes[array], colors[array], images[array], category, gender, stock)
+- CartItems (userId, productId, size, color, qty)
+- Wishlist (userId, productId)
+- Orders (id, userId, items[array], total, status, paymentId, shippingAddress, trackingId)
+- OrderStatusLog
+- Addresses (userId, type[shipping/billing], full address)
