@@ -39,7 +39,7 @@ import { ToastVariant } from "@/types/enums";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // API helpers
-import { get, post, put } from "@/utils/api";
+import { fetchVendors, addVendor, updateVendorStatus } from "@/lib/api";
 
 enum VendorStatus {
   ACTIVE = "ACTIVE",
@@ -72,15 +72,15 @@ export default function VendorManagement() {
   // 1. Fetch Vendors with Pagination & Search Query Params
   const { data: vendorResponse, isLoading } = useQuery({
     queryKey: ["vendors", currentPage, itemsPerPage, searchQuery],
-    queryFn: () => get<any>(`/vendors?page=${currentPage}&limit=${itemsPerPage}&search=${searchQuery}`),
+    queryFn: () => fetchVendors(currentPage, itemsPerPage, searchQuery),
   });
 
-  const vendors = vendorResponse?.data?.vendors || [];
-  const totalItems = vendorResponse?.data?.meta?.totalItems || 0;
+  const vendors = vendorResponse?.vendors || [];
+  const totalItems = vendorResponse?.meta?.totalItems || 0;
 
   // 2. Add Vendor Mutation
   const addMutation = useMutation({
-    mutationFn: (data: typeof newVendorData) => post("/vendors", data),
+    mutationFn: (data: typeof newVendorData) => addVendor(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["vendors"] });
       setIsAddSheetOpen(false);
@@ -89,7 +89,7 @@ export default function VendorManagement() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to add vendor",
+        description: error.message || "Failed to add vendor",
         variant: ToastVariant.DESTRUCTIVE,
       });
     }
@@ -98,7 +98,7 @@ export default function VendorManagement() {
   // 3. Update Status Mutation
   const statusMutation = useMutation({
     mutationFn: ({ id, status }: { id: number; status: VendorStatus }) => 
-      put(`/vendors/${id}/status`, { status }),
+      updateVendorStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["vendors"] });
       toast({ title: "Status Updated", description: "Vendor status synchronized." });

@@ -4,7 +4,7 @@ import { VendorLayout } from "@/components/ui/vendor-layout";
 import { Button } from "@/components/common/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/common/card";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { get, put } from "@/utils/api";
+import * as api from "@/lib/api";
 import { Product } from "@/lib/api";
 import { Plus, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -23,16 +23,14 @@ import { toast } from "sonner";
 export default function VendorProductsPage() {
   const queryClient = useQueryClient();
   
-  const { data: response, isLoading } = useQuery({
+  const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],
-    queryFn: () => get<Product[]>('/products'),
+    queryFn: () => api.fetchProducts(),
   });
-
-  const products = response?.data || [];
 
   const updateStatusMutation = useMutation({
     mutationFn: (data: { product: Product, newStatus: ProductStatus }) => {
-      return put(`/products/${data.product.id}`, { status: data.newStatus });
+      return api.updateProduct({ ...data.product, status: data.newStatus });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
