@@ -1,7 +1,7 @@
 // API client for backend communication
 import { CartData, Customer, Order, OrderItem, Stat } from '@/types/dto';
 import { dummyProducts, getProductById as getDummyProductById, dummyOrders } from './dummyData';
-import { ProductCategory, ProductSubCategory, ProductGender, OrderStatus, ProductSize } from '@/types/enums';
+import { ProductCategory, ProductSubCategory, ProductGender, OrderStatus, ProductSize, ProductStatus } from '@/types/enums';
 import { get } from '@/utils/api';
 
 export interface Product {
@@ -19,6 +19,7 @@ export interface Product {
   stock: number;
   newArrival: boolean;
   bestSeller: boolean;
+  status?: ProductStatus;
 }
 
 export interface CartItem {
