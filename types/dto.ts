@@ -52,3 +52,12 @@ export interface Stat {
   totalOrders: number;
   todayOrders: number;
 }
+
+export interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  totalOrders: number;
+  totalSpent: string;
+  lastOrderDate: string;
+}
