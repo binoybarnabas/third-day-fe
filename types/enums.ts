@@ -36,7 +36,12 @@ export enum AppRoutes {
     ADMIN_ORDERS = '/admin/orders',
     ADMIN_CUSTOMERS = '/admin/customers',
     ADMIN_SETTINGS = '/admin/settings',
-    LOGIN = '/login'
+    LOGIN = '/login',
+    VENDOR_LOGIN = "/vendor/login",
+    VENDOR_DASHBOARD = "/vendor",
+    VENDOR_PRODUCTS = "/vendor/products",
+    VENDOR_ORDERS = "/vendor/orders",
+    VENDOR_SETTINGS = "/vendor/settings",
 }
 
 export enum ProductCategory {
@@ -104,4 +109,10 @@ export enum ProductSize {
     ONE_SIZE = 'One Size',
     S_M = 'S/M',
     L_XL = 'L/XL',
+}
+
+export enum ProductStatus {
+  ACTIVE = "Active",
+  DRAFT = "Draft",
+  ARCHIVED = "Archived",
 }
