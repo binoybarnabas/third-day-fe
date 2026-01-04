@@ -1,7 +1,8 @@
 // API client for backend communication
-import { CartData, Order, OrderItem, Stat } from '@/types/dto';
+import { CartData, Customer, Order, OrderItem, Stat } from '@/types/dto';
 import { dummyProducts, getProductById as getDummyProductById, dummyOrders } from './dummyData';
 import { ProductCategory, ProductSubCategory, ProductGender, OrderStatus, ProductSize } from '@/types/enums';
+import { get } from '@/utils/api';
 
 export interface Product {
   id: number;
@@ -337,42 +338,7 @@ export async function fetchAllOrders(): Promise<Order[]> {
 
 // ============== CUSTOMERS ==============
 
-export interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  totalOrders: number;
-  totalSpent: string;
-  lastOrderDate: string;
-}
-
 export async function fetchCustomers(): Promise<Customer[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const orders = getStoredOrders();
-      const customersMap = new Map<string, Customer>();
-
-      orders.forEach(order => {
-        if (!customersMap.has(order.email)) {
-          customersMap.set(order.email, {
-            id: order.userId || `guest-${Math.random().toString(36).substr(2, 9)}`,
-            name: `${order.firstName} ${order.lastName}`,
-            email: order.email,
-            totalOrders: 0,
-            totalSpent: "0",
-            lastOrderDate: order.createdAt
-          });
-        }
-
-        const customer = customersMap.get(order.email)!;
-        customer.totalOrders += 1;
-        customer.totalSpent = (parseFloat(customer.totalSpent) + parseFloat(order.total)).toFixed(2);
-        if (new Date(order.createdAt) > new Date(customer.lastOrderDate)) {
-          customer.lastOrderDate = order.createdAt;
-        }
-      });
-
-      resolve(Array.from(customersMap.values()));
-    }, 300);
-  });
+    const res = await get<Customer[]>('/admin/customers');
+    return res.data;
 }
