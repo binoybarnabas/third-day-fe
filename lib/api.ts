@@ -297,16 +297,14 @@ export async function createOrder(data: {
 }
 
 export async function fetchOrders(userId?: string): Promise<Order[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const orders = getStoredOrders();
-      if (userId) {
-        resolve(orders.filter(o => o.userId === userId));
-      } else {
-        resolve(orders);
-      }
-    }, 300);
-  });
+    const url = userId ? `/orders?userId=${userId}` : '/orders';
+    const res = await get<Order[]>(url);
+    return res.data;
+}
+
+export async function updateOrderStatus(orderId: number, status: OrderStatus): Promise<Order> {
+    const res = await put<Order>(`/orders/${orderId}/status`, { status });
+    return res.data;
 }
 
 // ============== ADMIN API ==============
