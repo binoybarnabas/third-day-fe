@@ -2,7 +2,7 @@
 import { CartData, Customer, Order, OrderItem, Stat } from '@/types/dto';
 import { dummyProducts, getProductById as getDummyProductById, dummyOrders } from './dummyData';
 import { ProductCategory, ProductSubCategory, ProductGender, OrderStatus, ProductSize, ProductStatus } from '@/types/enums';
-import { get } from '@/utils/api';
+import { get, post, put } from '@/utils/api';
 
 export interface Product {
   id: number;
@@ -336,77 +336,20 @@ export async function fetchCustomers(): Promise<Customer[]> {
     return res.data;
 }
 
+
 // ============== VENDORS ==============
-const VENDORS_STORAGE_KEY = 'streetwear_vendors';
-import { dummyVendors } from './dummyData';
 
-function getStoredVendors(): any[] {
-  const stored = localStorage.getItem(VENDORS_STORAGE_KEY);
-  if (stored) {
-    return JSON.parse(stored);
-  }
-  localStorage.setItem(VENDORS_STORAGE_KEY, JSON.stringify(dummyVendors));
-  return dummyVendors;
+export async function fetchVendors(page = 1, limit = 10, search = "") {
+  const res = await get<any>(`/vendors?page=${page}&limit=${limit}&search=${search}`);
+  return res.data; 
 }
 
-export async function fetchVendors(page = 1, limit = 10, search = ""): Promise<{ vendors: any[], meta: { totalItems: number } }> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      let vendors = getStoredVendors();
-      
-      if (search) {
-        const query = search.toLowerCase();
-        vendors = vendors.filter(v => 
-          v.businessName.toLowerCase().includes(query) || 
-          v.ownerName.toLowerCase().includes(query) || 
-          v.email.toLowerCase().includes(query)
-        );
-      }
-      
-      const totalItems = vendors.length;
-      const start = (page - 1) * limit;
-      const end = start + limit;
-      const paginatedVendors = vendors.slice(start, end);
-      
-      resolve({
-        vendors: paginatedVendors,
-        meta: { totalItems }
-      });
-    }, 300);
-  });
+export async function addVendor(data: any) {
+  const res = await post<any>('/vendors', data);
+  return res.data;
 }
 
-export async function addVendor(data: any): Promise<any> {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const vendors = getStoredVendors();
-            const newVendor = {
-                id: Math.floor(Math.random() * 10000) + 100,
-                ...data,
-                productCount: 0,
-                totalSales: 0,
-                commission: 10,
-                createdAt: new Date().toISOString()
-            };
-            vendors.unshift(newVendor);
-            localStorage.setItem(VENDORS_STORAGE_KEY, JSON.stringify(vendors));
-            resolve(newVendor);
-        }, 500);
-    });
-}
-
-export async function updateVendorStatus(id: number, status: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const vendors = getStoredVendors();
-            const index = vendors.findIndex(v => v.id === id);
-            if (index !== -1) {
-                vendors[index].status = status;
-                localStorage.setItem(VENDORS_STORAGE_KEY, JSON.stringify(vendors));
-                resolve(vendors[index]);
-            } else {
-                reject(new Error("Vendor not found"));
-            }
-        }, 300);
-    });
+export async function updateVendor(id: number, data: any) {
+  const res = await put<any>(`/vendors/${id}`, data);
+  return res.data;
 }
