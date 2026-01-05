@@ -57,11 +57,11 @@ function getStoredProducts(): Product[] {
   return dummyProducts;
 }
 
-export async function fetchProducts(): Promise<Product[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(getStoredProducts()), 300);
-  });
-}
+// export async function fetchProducts(): Promise<Product[]> {
+//   return new Promise((resolve) => {
+//     setTimeout(() => resolve(getStoredProducts()), 300);
+//   });
+// }
 
 export async function fetchProduct(id: number): Promise<Product> {
   return new Promise((resolve, reject) => {
@@ -309,32 +309,24 @@ export async function fetchOrders(userId?: string): Promise<Order[]> {
   });
 }
 
-// ============== ADMIN ==============
+// ============== ADMIN API ==============
+
 
 export async function fetchAdminStats(): Promise<Stat> {
-  // Mock stats based on stored orders
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const orders = getStoredOrders();
-      const totalRevenue = parseFloat(orders.reduce((sum, order) => sum + parseFloat(order.total), 0).toFixed(2));
-      const totalOrders = orders.length;
-      const todayOrders = orders.filter(o => new Date(o.createdAt).toDateString() === new Date().toDateString()).length;
-
-      resolve({
-        totalRevenue,
-        totalOrders,
-        todayOrders
-      });
-    }, 300);
-  });
+    const res = await get<Stat>('/admin/stats');
+    return res.data;
 }
 
+
 export async function fetchAllOrders(): Promise<Order[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(getStoredOrders());
-    }, 300);
-  });
+    const res = await get<Order[]>('/admin/orders');
+    return res.data;
+}
+
+
+export async function fetchProducts(): Promise<Product[]> {
+    const res = await get<Product[]>('/products');
+    return res.data;
 }
 
 // ============== CUSTOMERS ==============
