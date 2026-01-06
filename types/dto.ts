@@ -51,6 +51,7 @@ export interface Stat {
   totalRevenue: number;
   totalOrders: number;
   todayOrders: number;
+  revenueChange?: string;
 }
 
 export interface Customer {
@@ -60,4 +61,11 @@ export interface Customer {
   totalOrders: number;
   totalSpent: string;
   lastOrderDate: string;
+}
+export interface Product {
+  id: number;
+  title: string;
+  price: string;
+  category: string;
+  images: string[];
 }
