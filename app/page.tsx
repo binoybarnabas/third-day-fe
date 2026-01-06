@@ -51,55 +51,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories Grid */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[600px] md:h-[500px]">
-          <Link href={AppRoutes.MEN} className="group relative overflow-hidden h-full md:col-span-1">
-            <Image
-              src={menCatImage}
-              alt="Men's Collection"
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-            <div className="absolute bottom-8 left-8">
-              <h3 className="text-3xl font-heading font-bold text-white uppercase mb-2">Men</h3>
-              <span className="text-white flex items-center gap-2 text-sm uppercase tracking-widest group-hover:underline decoration-2 underline-offset-4">
-                Shop Now <ArrowRight className="w-4 h-4" />
-              </span>
-            </div>
-          </Link>
-
-          <Link href={AppRoutes.WOMEN} className="group relative overflow-hidden h-full md:col-span-1">
-            <Image
-              src={womenCatImage}
-              alt="Women's Collection"
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-            <div className="absolute bottom-8 left-8">
-              <h3 className="text-3xl font-heading font-bold text-white uppercase mb-2">Women</h3>
-              <span className="text-white flex items-center gap-2 text-sm uppercase tracking-widest group-hover:underline decoration-2 underline-offset-4">
-                Shop Now <ArrowRight className="w-4 h-4" />
-              </span>
-            </div>
-          </Link>
-
-          <Link href={AppRoutes.ACCESSORIES} className="group relative overflow-hidden h-full md:col-span-1">
-            <Image
-              src={accessCatImage}
-              alt="Accessories"
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-            <div className="absolute bottom-8 left-8">
-              <h3 className="text-3xl font-heading font-bold text-white uppercase mb-2">Accessories</h3>
-              <span className="text-white flex items-center gap-2 text-sm uppercase tracking-widest group-hover:underline decoration-2 underline-offset-4">
-                Shop Now <ArrowRight className="w-4 h-4" />
-              </span>
-            </div>
-          </Link>
-        </div>
-      </section>
+      
 
       {/* Featured Products */}
       <section className="container mx-auto px-4 py-16 border-t border-border">
@@ -173,6 +125,56 @@ export default function Home() {
             ))}
           </div>
         )}
+      </section>
+
+      {/* Categories Grid */}
+      <section className="container mx-auto px-4 pt-0 pb-16 md:pb-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[600px] md:h-[500px]">
+          <Link href={AppRoutes.MEN} className="group relative overflow-hidden h-full md:col-span-1">
+            <Image
+              src={menCatImage}
+              alt="Men's Collection"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+            <div className="absolute bottom-8 left-8">
+              <h3 className="text-3xl font-heading font-bold text-white uppercase mb-2">Men</h3>
+              <span className="text-white flex items-center gap-2 text-sm uppercase tracking-widest group-hover:underline decoration-2 underline-offset-4">
+                Shop Now <ArrowRight className="w-4 h-4" />
+              </span>
+            </div>
+          </Link>
+
+          <Link href={AppRoutes.WOMEN} className="group relative overflow-hidden h-full md:col-span-1">
+            <Image
+              src={womenCatImage}
+              alt="Women's Collection"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+            <div className="absolute bottom-8 left-8">
+              <h3 className="text-3xl font-heading font-bold text-white uppercase mb-2">Women</h3>
+              <span className="text-white flex items-center gap-2 text-sm uppercase tracking-widest group-hover:underline decoration-2 underline-offset-4">
+                Shop Now <ArrowRight className="w-4 h-4" />
+              </span>
+            </div>
+          </Link>
+
+          <Link href={AppRoutes.ACCESSORIES} className="group relative overflow-hidden h-full md:col-span-1">
+            <Image
+              src={accessCatImage}
+              alt="Accessories"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+            <div className="absolute bottom-8 left-8">
+              <h3 className="text-3xl font-heading font-bold text-white uppercase mb-2">Accessories</h3>
+              <span className="text-white flex items-center gap-2 text-sm uppercase tracking-widest group-hover:underline decoration-2 underline-offset-4">
+                Shop Now <ArrowRight className="w-4 h-4" />
+              </span>
+            </div>
+          </Link>
+        </div>
       </section>
     </div>
   );

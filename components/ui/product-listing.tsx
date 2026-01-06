@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { ProductCategory, AppRoutes, SortOption } from "@/types/enums";
 import { ProductCard } from "@/components/ui/product-card";
 import { useQuery } from "@tanstack/react-query";
@@ -16,7 +16,7 @@ import { Slider } from "@/components/common/slider";
 import { Separator } from "@/components/common/separator";
 import { Button } from "@/components/common/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/common/sheet";
-import { Filter, ChevronDown } from "lucide-react";
+import { Filter, ChevronDown, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +25,7 @@ import {
 } from "@/components/common/dropdown-menu";
 import { Skeleton } from "@/components/common/skeleton";
 import { usePathname } from "next/navigation";
-import { PaginationControl } from "@/components/common/pagination-control";
+import { motion, AnimatePresence } from "framer-motion"; // Added for smooth load
 
 interface ProductListingProps {
   category?: string;
@@ -37,15 +37,16 @@ export default function ProductListing({ category: propCategory }: ProductListin
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState(SortOption.NEWEST);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  
+  // Dynamic Loading States
+  const [visibleCount, setVisibleCount] = useState(6);
+  const observerTarget = useRef(null);
 
   const { data: allProducts = [], isLoading } = useQuery({
     queryKey: ['products'],
     queryFn: api.fetchProducts,
   });
 
-  // Extract category from props or URL path
   const category = propCategory || (location === AppRoutes.SHOP
     ? undefined
     : location.slice(1).charAt(0).toUpperCase() + location.slice(2));
@@ -54,9 +55,8 @@ export default function ProductListing({ category: propCategory }: ProductListin
   const allSizes = Array.from(new Set(allProducts.flatMap(p => p.sizes)));
 
   const filteredProducts = useMemo(() => {
-    let result = allProducts; // Use allProducts from useQuery
+    let result = [...allProducts];
 
-    // Filter by Category
     if (category) {
       if (category === ProductCategory.ACCESSORIES) {
         result = result.filter(p => p.category === ProductCategory.ACCESSORIES);
@@ -65,50 +65,51 @@ export default function ProductListing({ category: propCategory }: ProductListin
       }
     }
 
-    // Filter by Price
     result = result.filter(
       (p) => parseFloat(p.price) >= priceRange[0] && parseFloat(p.price) <= priceRange[1]
     );
 
-    // Filter by Color
     if (selectedColors.length > 0) {
       result = result.filter((p) =>
         p.colors.some((c) => selectedColors.includes(c))
       );
     }
 
-    // Filter by Size
     if (selectedSizes.length > 0) {
       result = result.filter((p) =>
         p.sizes.some((s) => selectedSizes.includes(s))
       );
     }
 
-    // Sort
     if (sortBy === SortOption.PRICE_ASC) {
       result.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
     } else if (sortBy === SortOption.PRICE_DESC) {
       result.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
     } else {
-      // Newest
       result.sort((a, b) => b.id - a.id);
     }
 
     return result;
   }, [allProducts, category, priceRange, selectedColors, selectedSizes, sortBy]);
 
-  // Pagination Logic
-  const totalItems = filteredProducts.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  // Infinite Scroll Logic
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const [target] = entries;
+    if (target.isIntersecting && visibleCount < filteredProducts.length) {
+      setVisibleCount((prev) => prev + 3);
+    }
+  }, [filteredProducts.length, visibleCount]);
 
-  // Reset to page 1 when filters change
   useEffect(() => {
-    setCurrentPage(1);
-  }, [category, priceRange, selectedColors, selectedSizes, sortBy, itemsPerPage]);
+    const observer = new IntersectionObserver(handleObserver, { threshold: 1.0 });
+    if (observerTarget.current) observer.observe(observerTarget.current);
+    return () => observer.disconnect();
+  }, [handleObserver]);
+
+  // Reset visible count when filters change
+  useEffect(() => {
+    setVisibleCount(6);
+  }, [category, priceRange, selectedColors, selectedSizes, sortBy]);
 
   const toggleColor = (color: string) => {
     setSelectedColors(prev =>
@@ -200,7 +201,7 @@ export default function ProductListing({ category: propCategory }: ProductListin
             <h1 className="text-4xl font-heading font-bold uppercase tracking-tight mb-2">
               {category || "Shop All"}
             </h1>
-            <p className="text-muted-foreground">{totalItems} Products</p>
+            <p className="text-muted-foreground">{filteredProducts.length} Products</p>
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto">
@@ -249,18 +250,37 @@ export default function ProductListing({ category: propCategory }: ProductListin
             ) : filteredProducts.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
-                  {paginatedProducts.map(product => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
+                  <AnimatePresence mode="popLayout">
+                    {filteredProducts.slice(0, visibleCount).map((product, index) => (
+                      <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ 
+                          duration: 0.4, 
+                          delay: (index % 4) * 0.1, // Staggered entry
+                          ease: "easeOut" 
+                        }}
+                      >
+                        <ProductCard product={product} />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 </div>
-                <PaginationControl
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                  itemsPerPage={itemsPerPage}
-                  onItemsPerPageChange={setItemsPerPage}
-                  totalItems={totalItems}
-                />
+                
+                {/* Intersection Observer Trigger */}
+                <div 
+                  ref={observerTarget} 
+                  className="w-full flex justify-center py-12"
+                >
+                  {visibleCount < filteredProducts.length && (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
+                      <span className="text-xs uppercase tracking-widest text-neutral-500 font-bold">Loading Styles</span>
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <div className="text-center py-24">
