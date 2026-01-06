@@ -57,11 +57,11 @@ function getStoredProducts(): Product[] {
   return dummyProducts;
 }
 
-// export async function fetchProducts(): Promise<Product[]> {
-//   return new Promise((resolve) => {
-//     setTimeout(() => resolve(getStoredProducts()), 300);
-//   });
-// }
+export async function fetchProducts(): Promise<Product[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(getStoredProducts()), 300);
+  });
+}
 
 export async function fetchProduct(id: number): Promise<Product> {
   return new Promise((resolve, reject) => {
@@ -322,7 +322,7 @@ export async function fetchAllOrders(): Promise<Order[]> {
 }
 
 
-export async function fetchProducts(): Promise<Product[]> {
+export async function AdminFetchProducts(): Promise<Product[]> {
     const res = await get<Product[]>('/products');
     return res.data;
 }
