@@ -8,34 +8,60 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Separator } from "@/components/common/separator";
 import {  User, Store, Mail, MapPin, Phone, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import * as api from "@/lib/api";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 export default function VendorSettingsPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: "John",
-    lastName: "Vendor",
-    email: "vendor@example.com",
-    storeName: "StreetStyle Co.",
-    storeDescription: "Premium streetwear for the modern generation.",
-    phone: "+1 (555) 012-3456",
-    address: "123 Commerce St, New York, NY"
+  const { data: profile, isLoading: isFetching } = useQuery({
+    queryKey: ['vendorProfile'],
+    queryFn: api.fetchVendorProfile,
   });
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    storeName: "",
+    storeDescription: "",
+    phone: "",
+    address: ""
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setFormData(profile);
+    }
+  }, [profile]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const updateMutation = useMutation({
+    mutationFn: api.updateVendorProfile,
+    onSuccess: () => {
+      toast.success("Settings saved successfully!");
+    },
+    onError: () => {
+      toast.error("Failed to save settings.");
+    }
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success("Settings saved successfully!");
-    }, 1000);
+    updateMutation.mutate(formData);
   };
+
+  if (isFetching) {
+    return (
+      <VendorLayout>
+         <div className="flex justify-center items-center h-64">
+             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+         </div>
+      </VendorLayout>
+    );
+  }
 
   return (
     <VendorLayout>
@@ -153,8 +179,8 @@ export default function VendorSettingsPage() {
             </Card>
 
             <div className="flex justify-end">
-              <Button size="lg" disabled={isLoading}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              <Button size="lg" disabled={updateMutation.isPending}>
+                {updateMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 Save Changes
               </Button>
             </div>

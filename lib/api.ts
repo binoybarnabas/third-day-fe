@@ -351,3 +351,90 @@ export async function updateVendor(id: number, data: any) {
   const res = await put<any>(`/vendors/${id}`, data);
   return res.data;
 }
+
+// ============== VENDOR DASHBOARD (Dummy Data) ==============
+
+export interface VendorStats {
+  totalRevenue: string;
+  totalOrders: number;
+  productsCount: number;
+  todaySales: number;
+}
+
+export async function fetchVendorStats(): Promise<VendorStats> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        totalRevenue: "12,450",
+        totalOrders: 145,
+        productsCount: 24,
+        todaySales: 3
+      });
+    }, 500);
+  });
+}
+
+export async function fetchVendorOrders(limit = 5): Promise<Order[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const orders = getStoredOrders();
+      resolve(orders.slice(0, limit));
+    }, 500);
+  });
+}
+
+export async function fetchVendorProducts(): Promise<Product[]> {
+    return fetchProducts();
+}
+
+export async function fetchVendorProduct(id: number): Promise<Product> {
+    return fetchProduct(id);
+}
+
+export async function addVendorProduct(product: Product): Promise<Product> {
+    return addProduct(product);
+}
+
+export async function updateVendorProduct(product: Product): Promise<Product> {
+    return updateProduct(product);
+}
+
+export async function deleteVendorProduct(id: number): Promise<void> {
+    return deleteProduct(id);
+}
+
+// ============== VENDOR PROFILE ==============
+
+export interface VendorProfile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  storeName: string;
+  storeDescription: string;
+  phone: string;
+  address: string;
+}
+
+export async function fetchVendorProfile(): Promise<VendorProfile> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        firstName: "John",
+        lastName: "Vendor",
+        email: "vendor@example.com",
+        storeName: "StreetStyle Co.",
+        storeDescription: "Premium streetwear for the modern generation.",
+        phone: "+1 (555) 012-3456",
+        address: "123 Commerce St, New York, NY"
+      });
+    }, 500);
+  });
+}
+
+export async function updateVendorProfile(data: VendorProfile): Promise<VendorProfile> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(data);
+    }, 1000);
+  });
+}

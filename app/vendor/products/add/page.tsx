@@ -118,7 +118,7 @@ export default function VendorAddProductPage() {
         bestSeller: false,
       };
 
-      await api.addProduct(newProduct);
+      await api.addVendorProduct(newProduct);
       toast.success("Product added successfully!");
       router.push("/vendor/products");
     } catch (error) {

@@ -73,7 +73,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   // Fetch product data
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', productId],
-    queryFn: () => productId ? api.fetchProduct(productId) : Promise.resolve(null),
+    queryFn: () => productId ? api.fetchVendorProduct(productId) : Promise.resolve(null),
     enabled: !!productId,
   });
 
@@ -158,7 +158,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         stock: parseInt(stock) || 0,
       };
 
-      await api.updateProduct(updatedProduct);
+      await api.updateVendorProduct(updatedProduct);
       toast.success("Product updated successfully!");
       router.push("/vendor/products");
     } catch (error) {
