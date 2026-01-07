@@ -25,7 +25,7 @@ export default function VendorProductsPage() {
   
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],
-    queryFn: () => api.fetchProducts(),
+    queryFn: () => api.fetchVendorProducts(),
   });
 
   const updateStatusMutation = useMutation({
