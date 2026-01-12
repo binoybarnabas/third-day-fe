@@ -7,7 +7,7 @@ import {
   UserRound,
   ShoppingBag,
   Users,
-  Settings,
+  Package,
   LogOut
 } from "lucide-react";
 
@@ -16,10 +16,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: AppRoutes.ADMIN_DASHBOARD },
+    { icon: Package, label: "Products", href: AppRoutes.ADMIN_PRODUCTS },
     { icon: UserRound, label: "Vendors", href: AppRoutes.ADMIN_VENDORS },
     { icon: ShoppingBag, label: "Orders", href: AppRoutes.ADMIN_ORDERS },
     { icon: Users, label: "Customers", href: AppRoutes.ADMIN_CUSTOMERS },
-    { icon: Settings, label: "Settings", href: AppRoutes.ADMIN_SETTINGS },
   ];
 
   return (

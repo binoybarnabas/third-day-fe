@@ -1,6 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { AdminLayout } from "@/components/ui/admin-layout";
+import { useState, useRef } from "react";
 import { Button } from "@/components/common/button";
 import { Input } from "@/components/common/input";
 import { Label } from "@/components/common/label";
@@ -14,8 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/common/select";
-import { Checkbox } from "@/components/common/checkbox";
-import { toast } from "sonner";
 import * as api from "@/lib/api";
 import {
   ProductCategory,
@@ -24,30 +21,19 @@ import {
   ProductSize
 } from "@/types/enums";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, X, Upload, Loader2, Plus, Eye } from "lucide-react";
+import { ArrowLeft, Plus, X, Upload, Loader2, Eye } from "lucide-react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { Checkbox } from "@/components/common/checkbox";
+import { toast } from "sonner";
 import { ProductPreviewModal } from "@/components/vendor/product-preview-modal";
+import { AdminLayout } from "@/components/ui/admin-layout";
 
-interface EditProductPageProps {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
-export default function EditProductPage({ params }: EditProductPageProps) {
+export default function VendorAddProductPage() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   
-  // Unwrapping params safely
-  const [unwrappedParams, setUnwrappedParams] = useState<{id: string} | null>(null);
-
-  useEffect(() => {
-    params.then(p => setUnwrappedParams(p));
-  }, [params]);
-
-  const productId = unwrappedParams ? parseInt(unwrappedParams.id) : null;
-  
-  // State for form
+  // Form State
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
@@ -64,40 +50,6 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   // Refs
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  
-  // Submitting state
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
-
-  // Fetch product data
-  const { data: product, isLoading } = useQuery({
-    queryKey: ['product', productId],
-    queryFn: () => productId ? api.fetchVendorProduct(productId) : Promise.resolve(null),
-    enabled: !!productId,
-  });
-
-  // Populate form when data loads
-  useEffect(() => {
-     if (product && !isDataLoaded) {
-        setTitle(product.title);
-        setPrice(product.price);
-        setDescription(product.description || "");
-        setCategory(product.category);
-        setSubCategory(product.subCategory);
-        setGender(product.gender);
-        setStock(product.stock.toString());
-        setSelectedSizes(product.sizes || []);
-        
-        // Split images
-        if (product.images && product.images.length > 0) {
-            setThumbnail(product.images[0]);
-            setGallery(product.images.slice(1));
-        }
-        
-        setIsDataLoaded(true);
-     }
-  }, [product, isDataLoaded]);
 
   const handleThumbnailUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
      const file = e.target.files?.[0];
@@ -124,7 +76,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   };
 
   const removeThumbnail = () => setThumbnail(null);
-
+  
   const removeGalleryImage = (index: number) => {
     setGallery(gallery.filter((_, i) => i !== index));
   };
@@ -137,16 +89,21 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     }
   };
 
+  // ... (handleSizeToggle remains same)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!product || !productId) return;
-    
-    setIsSubmitting(true);
+    if (!title || !price || !category || !subCategory || !gender || !thumbnail) {
+      toast.error("Please fill in all required fields and upload a thumbnail.");
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
-      const allImages = thumbnail ? [thumbnail, ...gallery] : gallery;
-      
-      const updatedProduct: api.Product = {
-        ...product,
+      const allImages = [thumbnail, ...gallery];
+      const newProduct: api.Product = {
+        id: Date.now(), // Mock ID
         title,
         price,
         description,
@@ -155,29 +112,22 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         gender: gender as ProductGender,
         images: allImages,
         sizes: selectedSizes as ProductSize[],
+        colors: ["Black", "White"], // Default or add color picker
         stock: parseInt(stock) || 0,
+        newArrival: true,
+        bestSeller: false,
       };
 
-      await api.updateVendorProduct(updatedProduct);
-      toast.success("Product updated successfully!");
+      await api.addVendorProduct(newProduct);
+      toast.success("Product added successfully!");
       router.push("/admin/products");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to update product");
+      toast.error("Failed to add product");
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
-
-  if (!unwrappedParams || isLoading) {
-      return (
-          <AdminLayout>
-              <div className="flex justify-center items-center h-64">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              </div>
-          </AdminLayout>
-      )
-  }
 
   return (
     <AdminLayout>
@@ -188,45 +138,52 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-heading font-bold uppercase tracking-tight">Edit Product</h1>
-          <p className="text-muted-foreground text-sm">Update product details</p>
+          <h1 className="text-2xl font-heading font-bold uppercase tracking-tight">Add New Product</h1>
+          <p className="text-muted-foreground text-sm">Create a new listing for your store</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Form Area */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Product Details</CardTitle>
+        <div className="lg:col-span-2 space-y-8">
+          <Card className="border-none shadow-sm ring-1 ring-black/5">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg">Product Details</CardTitle>
+              <CardDescription>Basic information about your product</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Product Title</Label>
+                <Label htmlFor="title">Product Title <span className="text-red-500">*</span></Label>
                 <Input 
                   id="title" 
+                  placeholder="e.g. Oversized Graphic T-Shirt" 
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                  className="h-11"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="price">Price ($)</Label>
+                  <Label htmlFor="price">Price ($) <span className="text-red-500">*</span></Label>
                   <Input 
                     id="price" 
                     type="number" 
+                    placeholder="0.00" 
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
+                    className="h-11"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="stock">Stock Quantity</Label>
+                  <Label htmlFor="stock">Stock Quantity <span className="text-red-500">*</span></Label>
                   <Input 
                     id="stock" 
                     type="number" 
+                    placeholder="0" 
                     value={stock}
                     onChange={(e) => setStock(e.target.value)}
+                    className="h-11"
                   />
                 </div>
               </div>
@@ -235,7 +192,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                 <Label htmlFor="description">Description</Label>
                 <Textarea 
                   id="description" 
-                  className="min-h-[120px]"
+                  placeholder="Enter a detailed description about features, material, and fit..." 
+                  className="min-h-[160px] resize-y p-4 leading-relaxed"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
@@ -243,113 +201,135 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             </CardContent>
           </Card>
 
-          <Card>
-             <CardHeader>
-              <CardTitle>Classification & Variants</CardTitle>
+          <Card className="border-none shadow-sm ring-1 ring-black/5">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg">Classification</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Category Selects */}
-                    <div className="space-y-2">
-                      <Label>Category</Label>
-                      <Select value={category} onValueChange={setCategory}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {Object.values(ProductCategory).map((c) => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    {/* Other selects could go here similarly... */}
-                     <div className="space-y-2">
-                      <Label>Sub-Category</Label>
-                      <Select value={subCategory} onValueChange={setSubCategory}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {Object.values(ProductSubCategory).map((c) => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                     <div className="space-y-2">
-                      <Label>Gender</Label>
-                      <Select value={gender} onValueChange={setGender}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {Object.values(ProductGender).map((c) => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                 </div>
-
-                 <div className="space-y-2">
-                    <Label>Available Sizes</Label>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {Object.values(ProductSize).map((size) => (
-                        <div key={size} className="flex items-center space-x-2 border p-2 rounded hover:bg-muted cursor-pointer" onClick={() => handleSizeToggle(size)}>
-                          <Checkbox 
-                            id={`size-${size}`} 
-                            checked={selectedSizes.includes(size)}
-                            onCheckedChange={() => handleSizeToggle(size)}
-                          />
-                          <label className="text-sm font-medium cursor-pointer">{size}</label>
-                        </div>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Category <span className="text-red-500">*</span></Label>
+                  <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(ProductCategory).map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
                       ))}
-                    </div>
-                  </div>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                   <Label>Sub-Category <span className="text-red-500">*</span></Label>
+                   <Select value={subCategory} onValueChange={setSubCategory}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(ProductSubCategory).map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                   <Label>Gender <span className="text-red-500">*</span></Label>
+                   <Select value={gender} onValueChange={setGender}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(ProductGender).map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Available Sizes</Label>
+                <div className="flex flex-wrap gap-2">
+                  {Object.values(ProductSize).map((size) => {
+                    const isSelected = selectedSizes.includes(size);
+                    return (
+                      <div 
+                        key={size} 
+                        onClick={() => handleSizeToggle(size)}
+                        className={`
+                          cursor-pointer px-4 py-2 rounded-md border text-sm font-medium transition-all duration-200
+                          ${isSelected 
+                            ? "bg-black text-white border-black shadow-sm" 
+                            : "bg-white text-neutral-600 border-neutral-200 hover:border-black hover:text-black"
+                          }
+                        `}
+                      >
+                        {size}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Sidebar */}
+        
+        {/* Sidebar for Media & Actions */}
         <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Product Media</CardTitle>
-               <CardDescription>
+              <CardDescription>
                 Manage your product's visual presentation.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Thumbnail Section */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">Thumbnail (Front View)</Label>
-                <div className="border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center min-h-[200px] bg-secondary/20 relative transition-colors hover:bg-secondary/30">
+              <div className="space-y-4">
+                <Label className="text-base font-semibold">Thumbnail (Front View) <span className="text-red-500">*</span></Label>
+                <div 
+                  className={`
+                    border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center min-h-[260px] relative transition-all duration-200
+                    ${thumbnail ? "border-neutral-200 bg-white" : "border-neutral-300 bg-neutral-50 hover:bg-neutral-100/50 hover:border-neutral-400"}
+                  `}
+                >
                   {thumbnail ? (
-                    <div className="relative w-full h-full aspect-[3/4] max-h-[300px]">
-                      <img 
-                        src={thumbnail} 
-                        alt="Thumbnail" 
-                        className="w-full h-full object-contain rounded-md" 
-                      />
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <div className="relative w-full max-w-[200px] aspect-[3/4] shadow-lg rounded-lg overflow-hidden">
+                        <img 
+                          src={thumbnail} 
+                          alt="Thumbnail" 
+                          className="w-full h-full object-cover" 
+                        />
+                      </div>
                       <button 
                         type="button"
                         onClick={removeThumbnail}
-                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors shadow-sm"
+                        className="absolute -top-2 -right-2 bg-white text-destructive border shadow-sm rounded-full p-2 hover:bg-destructive hover:text-white transition-colors z-10"
                       >
                         <X className="h-4 w-4" />
                       </button>
-                      <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium shadow-sm">
                         Main Image
                       </div>
                     </div>
                   ) : (
-                     <div className="text-center space-y-4 w-full">
-                       <div className="flex flex-col items-center justify-center">
-                          <Upload className="h-10 w-10 opacity-50 mb-2" />
-                          <p className="text-sm font-medium text-muted-foreground">No thumbnail selected</p>
+                    <div className="text-center space-y-4 w-full max-w-xs mx-auto">
+                       <div className="w-16 h-16 bg-white rounded-full shadow-sm border flex items-center justify-center mx-auto mb-2">
+                          <Upload className="h-8 w-8 text-neutral-400" />
+                       </div>
+                       <div className="space-y-1">
+                          <h3 className="font-semibold text-neutral-900">Upload Thumbnail</h3>
+                          <p className="text-sm text-muted-foreground">Click to browse or drag & drop</p>
                        </div>
                        <Button 
                           type="button" 
-                          variant="outline"
+                          variant="default" // Changed to default black button
                           onClick={() => thumbnailInputRef.current?.click()}
-                          className="w-full"
+                          className="w-full mt-2"
                        >
-                          Select Thumbnail
+                          Select Image
                        </Button>
                        <input 
                           ref={thumbnailInputRef}
@@ -367,7 +347,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
 
               {/* Gallery Section */}
               <div className="space-y-3">
-                 <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                    <Label className="text-base font-semibold">Gallery Images</Label>
                    <Button 
                       type="button" 
@@ -387,12 +367,13 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                       onChange={handleGalleryUpload} 
                    />
                 </div>
-                 <div className="grid grid-cols-3 gap-2">
+                
+                <div className="grid grid-cols-3 gap-2">
                   {gallery.map((img, idx) => (
                     <div key={idx} className="relative group aspect-square rounded-md overflow-hidden bg-secondary border">
                       <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
                       <button 
-                        type="button"
+                         type="button"
                         onClick={() => removeGalleryImage(idx)}
                         className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
@@ -400,7 +381,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                       </button>
                     </div>
                   ))}
-                   {gallery.length === 0 && (
+                  {gallery.length === 0 && (
                      <div className="col-span-3 py-8 text-center text-xs text-muted-foreground bg-muted/20 rounded-md border border-dashed">
                         No additional images
                      </div>
@@ -411,9 +392,10 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           </Card>
 
 
+
         </div>
       </div>
-
+      
       {/* Spacer for fixed footer */}
       <div className="h-24"></div>
 
@@ -432,13 +414,16 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             className="h-12 w-full md:w-auto min-w-[200px]" 
             size="lg" 
             onClick={handleSubmit} 
-            disabled={isSubmitting}
+            disabled={isLoading}
          >
-            {isSubmitting ? (
-                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
-            ) : "Save Changes"}
+            {isLoading ? (
+               <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Publishing...
+               </>
+            ) : "Publish Product"}
          </Button>
       </div>
+
 
       <ProductPreviewModal 
         isOpen={showPreview} 
@@ -451,7 +436,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
            category,
            subCategory,
            sizes: selectedSizes,
-           colors: ["Black", "White"]
+           colors: ["Black", "White"] // Static for now as it's not in form
         }}
       />
     </AdminLayout>
