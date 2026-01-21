@@ -14,8 +14,8 @@ export function ProductCard({ product }: ProductCardProps) {
   const isLiked = isInWishlist(product.id);
 
   return (
-    <div className="group relative">
-      <div className="aspect-[3/4] overflow-hidden bg-secondary relative">
+    <div className="group relative rounded-2xl transition-all duration-300"> {/* Added radius here */}
+      <div className="aspect-[3/4] overflow-hidden bg-secondary relative rounded-2xl"> {/* overflow-hidden is key */}
         <Link href={`/product/${product.id}`}>
           <img
             src={product.images[0]}
@@ -37,24 +37,23 @@ export function ProductCard({ product }: ProductCardProps) {
           <Heart className={`w-5 h-5 ${isLiked ? "fill-current" : ""}`} />
         </button>
         {product.newArrival && (
-          <span className="absolute top-4 left-4 bg-black text-white text-xs font-bold px-2 py-1 uppercase tracking-wider">
+          <span className="absolute top-4 left-4 bg-black text-white text-xs font-bold px-2 py-1 uppercase tracking-wider rounded-sm">
             New
           </span>
         )}
         {product.bestSeller && !product.newArrival && (
-          <span className="absolute top-4 left-4 bg-white text-black border border-black text-xs font-bold px-2 py-1 uppercase tracking-wider">
+          <span className="absolute top-4 left-4 bg-white text-black border border-black text-xs font-bold px-2 py-1 uppercase tracking-wider rounded-sm">
             Best Seller
           </span>
         )}
-
       </div>
 
-      <div className="mt-4 space-y-1">
+      <div className="mt-4 px-1 space-y-1">
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-sm font-medium text-foreground">
               <Link href={`/product/${product.id}`}>
-                <span aria-hidden="true" className="absolute inset-0" />
+                {/* Removed the absolute inset-0 span to allow better control over card hover */}
                 {product.title}
               </Link>
             </h3>
@@ -65,6 +64,6 @@ export function ProductCard({ product }: ProductCardProps) {
           </p>
         </div>
       </div>
-    </div >
+    </div>
   );
 }
