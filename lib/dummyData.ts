@@ -1,5 +1,8 @@
 import { Product } from './api';
-import { ProductCategory, ProductSubCategory, ProductGender, OrderStatus, ProductSize } from '@/types/enums';
+import { ProductCategory, ProductSubCategory, ProductGender, OrderStatus, ProductSize, AppRoutes } from '@/types/enums';
+import heroImage from "@/attached_assets/generated_images/hero_banner_with_streetwear_models.png";
+import menCatImage from "@/attached_assets/generated_images/men's_fashion_category_image.png";
+import womenCatImage from "@/attached_assets/generated_images/women's_fashion_category_image.png";
 
 // Dummy product data for streetwear clothing store
 export const dummyProducts: Product[] = [
@@ -749,3 +752,33 @@ export const dummyVendors = [
     createdAt: "2023-11-05T11:45:00Z"
   }
 ];
+
+export const HERO_SLIDES = [
+  {
+    image: heroImage,
+    title: "Define Your Identity",
+    description: "Curated streetwear for the modern generation. Minimalist aesthetics meets premium utility.",
+    buttonLeft: { label: "Shop Men", link: AppRoutes.MEN },
+    buttonRight: { label: "Shop Women", link: AppRoutes.WOMEN },
+  },
+  {
+    image: menCatImage,
+    title: "New Season Essentials",
+    description: "Discover the latest drops designed for maximum comfort and unparalleled style.",
+    buttonLeft: { label: "Explore New", link: AppRoutes.SHOP },
+    buttonRight: { label: "Top Rated", link: AppRoutes.SHOP },
+  },
+  {
+    image: womenCatImage,
+    title: "Style Without Compromise",
+    description: "High-performance fabrics combined with cutting-edge streetwear silhouettes.",
+    buttonLeft: { label: "View All", link: AppRoutes.SHOP },
+    buttonRight: { label: "Accessories", link: AppRoutes.ACCESSORIES },
+  }
+];
+
+export const FIRST_ORDER_COUPON = {
+  code: "IDENTITY15",
+  discount: "15%",
+  description: "Valid on your first purchase"
+};
