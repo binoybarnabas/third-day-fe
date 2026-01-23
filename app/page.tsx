@@ -52,7 +52,7 @@ export default function Home() {
       <FirstTimePopup />
       
       {/* HERO CAROUSEL SECTION */}
-      <section className="relative h-[90vh] w-full overflow-hidden bg-black">
+      <section className="relative h-[60vh] md:h-[90vh] w-full overflow-hidden bg-black">
         <AnimatePresence initial={false} mode="popLayout">
           <motion.div
             key={currentSlide}
@@ -72,16 +72,16 @@ export default function Home() {
               priority
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-black/30" />
+            <div className="absolute inset-0 bg-black/40 md:bg-black/30" />
 
             {/* TEXT CONTENT INSIDE THE SLIDING DIV */}
             <div className="absolute inset-0 flex items-center justify-center text-center">
-              <div className="max-w-4xl px-4">
+              <div className="max-w-4xl px-6 md:px-4">
                 <motion.h1 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-5xl md:text-7xl lg:text-8xl font-heading font-bold text-white mb-6 uppercase tracking-tighter leading-none"
+                  className="text-4xl md:text-7xl lg:text-8xl font-heading font-bold text-white mb-4 md:mb-6 uppercase tracking-tighter leading-none"
                 >
                   {HERO_SLIDES[currentSlide].title}
                 </motion.h1>
@@ -89,7 +89,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto font-light"
+                  className="text-base md:text-xl text-white/90 mb-6 md:mb-8 max-w-2xl mx-auto font-light leading-relaxed"
                 >
                   {HERO_SLIDES[currentSlide].description}
                 </motion.p>
@@ -101,14 +101,14 @@ export default function Home() {
                 >
                   <Button
                     size="lg"
-                    className="h-14 px-8 text-base uppercase tracking-widest font-bold rounded-none bg-white text-black hover:bg-transparent hover:text-white border-2 border-white transition-colors duration-300"
+                    className="h-12 md:h-14 px-8 text-sm md:text-base uppercase tracking-widest font-bold rounded-none bg-white text-black hover:bg-transparent hover:text-white border-2 border-white transition-colors duration-300"
                     asChild
                   >
                     <Link href={HERO_SLIDES[currentSlide].buttonLeft.link}>{HERO_SLIDES[currentSlide].buttonLeft.label}</Link>
                   </Button>
                   <Button
                     size="lg"
-                    className="h-14 px-8 text-base uppercase tracking-widest font-bold rounded-none bg-transparent text-white border-2 border-white hover:bg-white hover:text-black transition-colors duration-300"
+                    className="h-12 md:h-14 px-8 text-sm md:text-base uppercase tracking-widest font-bold rounded-none bg-transparent text-white border-2 border-white hover:bg-white hover:text-black transition-colors duration-300"
                     asChild
                   >
                     <Link href={HERO_SLIDES[currentSlide].buttonRight.link}>{HERO_SLIDES[currentSlide].buttonRight.label}</Link>
@@ -165,7 +165,7 @@ export default function Home() {
             ? [1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="min-w-full sm:min-w-[calc(50%-12px)] lg:min-w-[calc(25%-18px)] space-y-4"
+                  className="min-w-[calc(50%-12px)] sm:min-w-[calc(50%-12px)] lg:min-w-[calc(25%-18px)] snap-start"
                 >
                   <Skeleton className="aspect-[3/4] w-full rounded-2xl" />
                   <Skeleton className="h-4 w-3/4" />
@@ -174,7 +174,7 @@ export default function Home() {
             : featuredProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="min-w-full sm:min-w-[calc(50%-12px)] lg:min-w-[calc(25%-18px)] snap-start"
+                  className="min-w-[calc(50%-12px)] sm:min-w-[calc(50%-12px)] lg:min-w-[calc(25%-18px)] snap-start"
                 >
                   <ProductCard product={product} />
                 </div>
@@ -183,20 +183,29 @@ export default function Home() {
       </section>
 
       {/* Banner Break */}
-      <section className="bg-black text-white py-24">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-6xl font-heading font-bold uppercase tracking-tighter mb-6">
-            New Season Drop
-          </h2>
-          <p className="text-neutral-400 max-w-xl mx-auto mb-8 text-lg">
-            Explore the latest additions to our collection. Limited quantities
-            available for our exclusive seasonal release.
-          </p>
-          <Button className="bg-white text-black hover:bg-neutral-200 h-14 px-10 text-base uppercase tracking-widest font-bold rounded-none">
-            Explore Collection
-          </Button>
-        </div>
-      </section>
+      <section className="bg-black text-white py-12 md:py-24">
+  <div className="container mx-auto px-6 md:px-4 text-center">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+    >
+      <h2 className="text-3xl md:text-6xl font-heading font-bold uppercase tracking-tighter mb-4 md:mb-6 leading-none">
+        New Season Drop
+      </h2>
+      <p className="text-neutral-400 max-w-sm md:max-w-xl mx-auto mb-8 text-sm md:text-lg font-light leading-relaxed">
+        Explore the latest additions to our collection. Limited quantities
+        available for our exclusive seasonal release.
+      </p>
+      <Button 
+        className="bg-white text-black hover:bg-neutral-200 h-12 md:h-14 px-8 md:px-10 text-sm md:text-base uppercase tracking-widest font-bold rounded-none transition-transform active:scale-95"
+      >
+        Explore Collection
+      </Button>
+    </motion.div>
+  </div>
+</section>
 
       {/* New Arrivals Slider */}
       <section className="container mx-auto px-4 py-24 relative">
@@ -232,7 +241,7 @@ export default function Home() {
             ? [1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="min-w-full sm:min-w-[calc(50%-12px)] lg:min-w-[calc(25%-18px)] space-y-4"
+                  className="min-w-[calc(50%-12px)] sm:min-w-[calc(50%-12px)] lg:min-w-[calc(25%-18px)] snap-start"
                 >
                   <Skeleton className="aspect-[3/4] w-full rounded-2xl" />
                   <Skeleton className="h-4 w-3/4" />
@@ -241,7 +250,7 @@ export default function Home() {
             : newArrivals.map((product) => (
                 <div
                   key={product.id}
-                  className="min-w-full sm:min-w-[calc(50%-12px)] lg:min-w-[calc(25%-18px)] snap-start"
+                  className="min-w-[calc(50%-12px)] sm:min-w-[calc(50%-12px)] lg:min-w-[calc(25%-18px)] snap-start"
                 >
                   <ProductCard product={product} />
                 </div>
