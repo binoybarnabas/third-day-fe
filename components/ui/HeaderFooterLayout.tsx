@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShoppingBag, Menu, Search, User, Heart } from "lucide-react";
+import { ShoppingBag, Menu, Search, User, Heart,X } from "lucide-react";
 import { Button } from "@/components/common/button";
 import { Input } from "@/components/common/input";
 import { useCart } from "@/lib/cart";
@@ -10,12 +10,19 @@ import { CartDrawer } from "./cart-drawer";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/common/sheet";
 import { AppRoutes } from "@/types/enums";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
-export function HeaderFooterLayout({ children }: { children: React.ReactNode }) {
+export function HeaderFooterLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { cartCount, setIsCartOpen } = useCart();
   const { items: wishlistItems } = useWishlist();
-  const [location] = usePathname();
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const navLinks = [
     { href: AppRoutes.MEN, label: "Men" },
@@ -34,8 +41,8 @@ export function HeaderFooterLayout({ children }: { children: React.ReactNode }) 
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          {/* Mobile Menu */}
-          <div className="lg:hidden">
+          {/* Mobile Menu & Search Icon */}
+          <div className="lg:hidden flex items-center gap-1">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -57,22 +64,59 @@ export function HeaderFooterLayout({ children }: { children: React.ReactNode }) 
                     ))}
                   </nav>
                   <div className="border-t pt-6 space-y-4">
-                    <Link href={AppRoutes.ACCOUNT} className="flex items-center gap-2 text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link
+                      href={AppRoutes.ACCOUNT}
+                      className="flex items-center gap-2 text-sm font-medium"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
                       <User className="h-4 w-4" /> My Account
                     </Link>
-                    <Link href={AppRoutes.WISHLIST} className="flex items-center gap-2 text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link
+                      href={AppRoutes.WISHLIST}
+                      className="flex items-center gap-2 text-sm font-medium"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
                       <Heart className="h-4 w-4" /> Wishlist
                     </Link>
                   </div>
                 </div>
               </SheetContent>
             </Sheet>
+            
+            {/* Mobile Search Toggle Button */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+            >
+              {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+            </Button>
           </div>
 
-          {/* Logo */}
+          {/* Logo Container */}
           <div className="flex-1 lg:flex-none flex justify-center lg:justify-start">
-            <Link href={AppRoutes.HOME} className="text-2xl font-heading font-bold tracking-tighter uppercase">
-              Street<span className="text-muted-foreground">•</span>Wear
+            <Link href={AppRoutes.HOME} className="flex items-center">
+              <div className="lg:hidden block">
+                <Image
+                  src="/images/logos/logo_black_png.png"
+                  alt="Streetwear Mobile Logo"
+                  width={70}
+                  height={70}
+                  className="object-contain"
+                  priority
+                />
+              </div>
+
+              <div className="hidden lg:block">
+                <Image
+                  src="/images/logos/logo_full_black_png.png"
+                  alt="Third Day Atelier Desktop Logo"
+                  width={380} // Back to your original size
+                  height={50} // Back to your original size
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </Link>
           </div>
 
@@ -82,8 +126,11 @@ export function HeaderFooterLayout({ children }: { children: React.ReactNode }) 
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium uppercase tracking-wide hover:text-muted-foreground transition-colors ${location === link.href ? "text-black border-b-2 border-black" : ""
-                  }`}
+                className={`text-sm font-medium uppercase tracking-wide hover:text-muted-foreground transition-colors ${
+                  pathname === link.href
+                    ? "text-black border-b-2 border-black"
+                    : ""
+                }`}
               >
                 {link.label}
               </Link>
@@ -101,13 +148,24 @@ export function HeaderFooterLayout({ children }: { children: React.ReactNode }) 
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             </div>
 
-            <Button variant="ghost" size="icon" className="hidden lg:flex" asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden lg:flex"
+              asChild
+            >
               <Link href={AppRoutes.ACCOUNT}>
                 <User className="h-5 w-5" />
               </Link>
             </Button>
 
-            <Button variant="ghost" size="icon" className="hidden lg:flex relative" asChild>
+            {/* Wishlist Icon: Removed 'hidden lg:flex' so it's visible on mobile */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative"
+              asChild
+            >
               <Link href={AppRoutes.WISHLIST}>
                 <Heart className="h-5 w-5" />
                 {wishlistItems.length > 0 && (
@@ -133,64 +191,170 @@ export function HeaderFooterLayout({ children }: { children: React.ReactNode }) 
             </Button>
           </div>
         </div>
+
+        {/* Animated Mobile Search Bar */}
+        <AnimatePresence>
+          {isSearchOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="lg:hidden w-full bg-background border-b border-border overflow-hidden"
+            >
+              <div className="p-4">
+                <div className="relative">
+                  <Input 
+                    autoFocus 
+                    placeholder="SEARCH PRODUCTS..." 
+                    className="h-12 bg-secondary border-none rounded-none uppercase text-sm pl-10" 
+                  />
+                  <Search className="absolute left-3 top-3.5 h-5 w-5 text-muted-foreground" />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
 
       {/* Footer */}
-      <footer className="bg-black text-white pt-16 pb-8">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-            <div className="space-y-4">
-              <h4 className="text-xl font-heading font-bold uppercase">Street•Wear</h4>
-              <p className="text-neutral-400 text-sm leading-relaxed">
-                Redefining modern streetwear with minimalist aesthetics and premium quality materials.
+      <footer className="bg-black text-white pt-12 pb-8">
+        <div className="container mx-auto px-6 md:px-4">
+          {/* Main Footer Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-10 md:gap-12 mb-12">
+            {/* 1. Brand Section - Takes full width on mobile, 1 col on desktop */}
+            <div className="col-span-2 md:col-span-1 space-y-4">
+              <h4 className="text-xl font-heading font-bold uppercase tracking-tighter">
+                Street•Wear
+              </h4>
+              <p className="text-neutral-400 text-sm leading-relaxed max-w-xs">
+                Redefining modern streetwear with minimalist aesthetics and
+                premium materials.
               </p>
             </div>
 
-            <div>
-              <h5 className="font-bold uppercase tracking-wider mb-4 text-sm">Shop</h5>
-              <ul className="space-y-2 text-sm text-neutral-400">
-                <li><Link href={AppRoutes.MEN} className="hover:text-white">Men</Link></li>
-                <li><Link href={AppRoutes.WOMEN} className="hover:text-white">Women</Link></li>
-                <li><Link href={AppRoutes.ACCESSORIES} className="hover:text-white">Accessories</Link></li>
-                <li><Link href={AppRoutes.NEW_ARRIVALS} className="hover:text-white">New Arrivals</Link></li>
+            {/* 2. Shop Section - 1 col on mobile */}
+            <div className="col-span-1">
+              <h5 className="font-bold uppercase tracking-wider mb-5 text-xs md:text-sm">
+                Shop
+              </h5>
+              <ul className="space-y-3 text-sm text-neutral-400">
+                <li>
+                  <Link
+                    href={AppRoutes.MEN}
+                    className="hover:text-white transition-colors"
+                  >
+                    Men
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={AppRoutes.WOMEN}
+                    className="hover:text-white transition-colors"
+                  >
+                    Women
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={AppRoutes.ACCESSORIES}
+                    className="hover:text-white transition-colors"
+                  >
+                    Accessories
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={AppRoutes.NEW_ARRIVALS}
+                    className="hover:text-white transition-colors"
+                  >
+                    New Drops
+                  </Link>
+                </li>
               </ul>
             </div>
 
-            <div>
-              <h5 className="font-bold uppercase tracking-wider mb-4 text-sm">Help</h5>
-              <ul className="space-y-2 text-sm text-neutral-400">
-                <li><Link href={AppRoutes.SHIPPING} className="hover:text-white">Shipping & Returns</Link></li>
-                <li><Link href={AppRoutes.FAQ} className="hover:text-white">FAQ</Link></li>
-                <li><Link href={AppRoutes.CONTACT} className="hover:text-white">Contact Us</Link></li>
-                <li><Link href={AppRoutes.SIZE_GUIDE} className="hover:text-white">Size Guide</Link></li>
+            {/* 3. Help Section - 1 col on mobile (Sits next to Shop) */}
+            <div className="col-span-1">
+              <h5 className="font-bold uppercase tracking-wider mb-5 text-xs md:text-sm">
+                Help
+              </h5>
+              <ul className="space-y-3 text-sm text-neutral-400">
+                <li>
+                  <Link
+                    href={AppRoutes.SHIPPING}
+                    className="hover:text-white transition-colors"
+                  >
+                    Shipping
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={AppRoutes.FAQ}
+                    className="hover:text-white transition-colors"
+                  >
+                    FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={AppRoutes.CONTACT}
+                    className="hover:text-white transition-colors"
+                  >
+                    Contact
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={AppRoutes.SIZE_GUIDE}
+                    className="hover:text-white transition-colors"
+                  >
+                    Sizing
+                  </Link>
+                </li>
               </ul>
             </div>
 
-            <div>
-              <h5 className="font-bold uppercase tracking-wider mb-4 text-sm">Newsletter</h5>
-              <p className="text-neutral-400 text-sm mb-4">Subscribe for exclusive drops and offers.</p>
-              <div className="flex gap-2">
+            {/* 4. Newsletter - Full width on mobile */}
+            <div className="col-span-2 md:col-span-1 space-y-4 pt-4 md:pt-0">
+              <h5 className="font-bold uppercase tracking-wider text-xs md:text-sm">
+                Newsletter
+              </h5>
+              <p className="text-neutral-400 text-sm">
+                Exclusive drops and early access.
+              </p>
+              <div className="flex flex-col gap-2">
                 <Input
                   placeholder="EMAIL ADDRESS"
-                  className="bg-neutral-900 border-neutral-800 text-white rounded-none h-10 text-xs uppercase placeholder:text-neutral-600 focus-visible:ring-white"
+                  className="bg-neutral-900 border-neutral-800 text-white rounded-none h-11 text-xs uppercase focus-visible:ring-white"
                 />
-                <Button className="bg-white text-black hover:bg-neutral-200 rounded-none h-10 px-6 font-bold uppercase text-xs">
-                  Join
+                <Button className="bg-white text-black hover:bg-neutral-200 rounded-none h-11 font-bold uppercase text-xs w-full">
+                  Subscribe
                 </Button>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-neutral-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-500 uppercase">
-            <p>© 2025 Street•Wear. All rights reserved.</p>
-            <div className="flex gap-6">
-              <Link href={AppRoutes.PRIVACY} className="hover:text-white">Privacy Policy</Link>
-              <Link href={AppRoutes.TERMS} className="hover:text-white">Terms of Service</Link>
+          {/* Bottom Bar */}
+          <div className="border-t border-neutral-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] text-neutral-500 uppercase tracking-[0.15em]">
+            <div className="flex gap-8 order-1 md:order-2">
+              <Link
+                href={AppRoutes.PRIVACY}
+                className="hover:text-white transition-colors"
+              >
+                Privacy
+              </Link>
+              <Link
+                href={AppRoutes.TERMS}
+                className="hover:text-white transition-colors"
+              >
+                Terms
+              </Link>
             </div>
+            <p className="order-2 md:order-1">
+              © 2026 Street•Wear. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
