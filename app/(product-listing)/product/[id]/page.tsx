@@ -216,20 +216,20 @@ export default function ProductDetail() {
               {/* Info Accordion */}
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="description">
-                  <AccordionTrigger className="uppercase font-bold text-sm">Description</AccordionTrigger>
+                  <AccordionTrigger className="uppercase font-bold text-sm hover:no-underline px-0">Description</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground leading-relaxed">
                     {product.description}
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="shipping">
-                  <AccordionTrigger className="uppercase font-bold text-sm">Shipping & Returns</AccordionTrigger>
+                  <AccordionTrigger className="uppercase font-bold text-sm hover:no-underline px-0">Shipping & Returns</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground leading-relaxed">
                     <p className="mb-2">Free standard shipping on orders over $150.</p>
                     <p>Returns accepted within 30 days of delivery. Items must be unworn and in original packaging.</p>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="details">
-                  <AccordionTrigger className="uppercase font-bold text-sm">Product Details</AccordionTrigger>
+                  <AccordionTrigger className="uppercase font-bold text-sm hover:no-underline px-0">Product Details</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground leading-relaxed">
                     <ul className="list-disc pl-4 space-y-1">
                       <li>Premium heavyweight cotton</li>
