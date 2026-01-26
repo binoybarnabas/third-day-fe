@@ -126,7 +126,7 @@ export function HeaderFooterLayout({
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium uppercase tracking-wide hover:text-muted-foreground transition-colors ${
+                className={`text-sm font-medium uppercase tracking-wide hover:text-muted-foreground transition-colors whitespace-nowrap ${
                   pathname === link.href
                     ? "text-black border-b-2 border-black"
                     : ""
@@ -139,13 +139,13 @@ export function HeaderFooterLayout({
 
           {/* Actions */}
           <div className="flex items-center gap-2 lg:gap-4">
-            <div className="hidden lg:flex w-64 relative">
+            <div className="hidden lg:flex w-64 relative group">
               <Input
                 type="search"
-                placeholder="SEARCH..."
-                className="h-9 bg-secondary border-none rounded-none text-xs focus-visible:ring-1 pl-8 uppercase placeholder:text-muted-foreground/70"
+                placeholder="Search..."
+                className="h-9 bg-secondary/50 border-transparent rounded-full text-xs focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:border-primary pl-9 uppercase placeholder:text-muted-foreground/70 transition-all duration-300 hover:bg-secondary/80 focus:bg-background focus:ring-1 focus:w-full"
               />
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
             </div>
 
             <Button

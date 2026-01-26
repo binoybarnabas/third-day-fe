@@ -15,7 +15,7 @@ import { Label } from "@/components/common/label";
 import { Slider } from "@/components/common/slider";
 import { Separator } from "@/components/common/separator";
 import { Button } from "@/components/common/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/common/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/common/sheet";
 import { Filter, ChevronDown, Loader2, ArrowUp } from "lucide-react";
 import {
   DropdownMenu,
@@ -38,7 +38,7 @@ export default function ProductListing({ category: propCategory }: ProductListin
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState(SortOption.NEWEST);
   
-  const [visibleCount, setVisibleCount] = useState(6);
+  const [visibleCount, setVisibleCount] = useState(8);
   const observerTarget = useRef(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -91,7 +91,7 @@ export default function ProductListing({ category: propCategory }: ProductListin
   const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
     const [target] = entries;
     if (target.isIntersecting && visibleCount < filteredProducts.length) {
-      setVisibleCount((prev) => prev + 3);
+      setVisibleCount((prev) => prev + 4);
     }
   }, [filteredProducts.length, visibleCount]);
 
@@ -110,7 +110,7 @@ export default function ProductListing({ category: propCategory }: ProductListin
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   useEffect(() => {
-    setVisibleCount(6);
+    setVisibleCount(8);
   }, [category, priceRange, selectedColors, selectedSizes, sortBy]);
 
   const toggleColor = (color: string) => {
@@ -130,7 +130,7 @@ export default function ProductListing({ category: propCategory }: ProductListin
 
       <Accordion type="multiple" defaultValue={["price", "color", "size"]} className="w-full">
         <AccordionItem value="price">
-          <AccordionTrigger className="uppercase font-bold text-sm">Price</AccordionTrigger>
+          <AccordionTrigger className="uppercase font-bold text-sm hover:no-underline px-0">Price</AccordionTrigger>
           <AccordionContent>
             <div className="px-2 py-4">
               <Slider defaultValue={[0, 300]} max={500} step={1} value={priceRange} onValueChange={setPriceRange} className="mb-4" />
@@ -143,7 +143,7 @@ export default function ProductListing({ category: propCategory }: ProductListin
         </AccordionItem>
 
         <AccordionItem value="color">
-          <AccordionTrigger className="uppercase font-bold text-sm">Color</AccordionTrigger>
+          <AccordionTrigger className="uppercase font-bold text-sm hover:no-underline px-0">Color</AccordionTrigger>
           <AccordionContent>
             <div className="space-y-2">
               {allColors.map(color => (
@@ -157,7 +157,7 @@ export default function ProductListing({ category: propCategory }: ProductListin
         </AccordionItem>
 
         <AccordionItem value="size">
-          <AccordionTrigger className="uppercase font-bold text-sm">Size</AccordionTrigger>
+          <AccordionTrigger className="uppercase font-bold text-sm hover:no-underline px-0">Size</AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-4 gap-2">
               {allSizes.map(size => (
@@ -194,6 +194,9 @@ export default function ProductListing({ category: propCategory }: ProductListin
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] overflow-y-auto">
+              <div className="sr-only">
+                <SheetTitle>Filter Products</SheetTitle>
+              </div>
               <FilterSidebar />
             </SheetContent>
           </Sheet>
@@ -223,7 +226,7 @@ export default function ProductListing({ category: propCategory }: ProductListin
 
         <div className="flex-1">
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="space-y-4">
                   <Skeleton className="aspect-[3/4] w-full" />
@@ -234,7 +237,7 @@ export default function ProductListing({ category: propCategory }: ProductListin
             </div>
           ) : filteredProducts.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
                 <AnimatePresence mode="popLayout">
                   {filteredProducts.slice(0, visibleCount).map((product, index) => (
                     <motion.div

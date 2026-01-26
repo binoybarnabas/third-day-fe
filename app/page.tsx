@@ -16,6 +16,29 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FirstTimePopup } from "@/components/ui/first-time-popup";
 
+const swipeConfidenceThreshold = 10000;
+const swipePower = (offset: number, velocity: number) => {
+  return Math.abs(offset) * velocity;
+};
+
+const variants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? "100%" : "-100%",
+    opacity: 0,
+    zIndex: 0
+  }),
+  center: {
+    zIndex: 1,
+    x: 0,
+    opacity: 1
+  },
+  exit: (direction: number) => ({
+    zIndex: 0,
+    x: direction < 0 ? "100%" : "-100%",
+    opacity: 0
+  })
+};
+
 export default function Home() {
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["products"],
@@ -26,14 +49,21 @@ export default function Home() {
   const newArrivals = products.filter((p) => p.newArrival).slice(0, 12);
 
   // --- CAROUSEL LOGIC ---
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [[page, direction], setPage] = useState([0, 0]);
+  
+  // We wrap the index to ensure it's always valid
+  const currentSlideIndex = ((page % HERO_SLIDES.length) + HERO_SLIDES.length) % HERO_SLIDES.length;
+
+  const paginate = (newDirection: number) => {
+    setPage([page + newDirection, newDirection]);
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, 4000);
+      paginate(1);
+    }, 7000);
     return () => clearInterval(timer);
-  }, []);
+  }, [page]);
 
   // --- SCROLL LOGIC ---
   const trendingRef = useRef<HTMLDivElement>(null);
@@ -52,21 +82,35 @@ export default function Home() {
       <FirstTimePopup />
       
       {/* HERO CAROUSEL SECTION */}
-      <section className="relative h-[60vh] md:h-[90vh] w-full overflow-hidden bg-black">
-        <AnimatePresence initial={false} mode="popLayout">
+      <section className="relative h-[60vh] md:h-[90vh] w-full overflow-hidden bg-black touch-pan-y">
+        <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.div
-            key={currentSlide}
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ 
-              x: { type: "spring", stiffness: 40, damping: 20 },
-              opacity: { duration: 0.5 } 
+            key={page}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: "spring", stiffness: 30, damping: 20 },
+              opacity: { duration: 0.8 }
             }}
-            className="absolute inset-0 w-full h-full"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={1}
+            onDragEnd={(e, { offset, velocity }) => {
+              const swipe = swipePower(offset.x, velocity.x);
+
+              if (swipe < -swipeConfidenceThreshold) {
+                paginate(1);
+              } else if (swipe > swipeConfidenceThreshold) {
+                paginate(-1);
+              }
+            }}
+            className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
           >
             <Image
-              src={HERO_SLIDES[currentSlide].image}
+              src={HERO_SLIDES[currentSlideIndex].image}
               alt="Streetwear Banner"
               fill
               priority
@@ -80,23 +124,23 @@ export default function Home() {
                 <motion.h1 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
+                  transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
                   className="text-4xl md:text-7xl lg:text-8xl font-heading font-bold text-white mb-4 md:mb-6 uppercase tracking-tighter leading-none"
                 >
-                  {HERO_SLIDES[currentSlide].title}
+                  {HERO_SLIDES[currentSlideIndex].title}
                 </motion.h1>
                 <motion.p 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
+                  transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
                   className="text-base md:text-xl text-white/90 mb-6 md:mb-8 max-w-2xl mx-auto font-light leading-relaxed"
                 >
-                  {HERO_SLIDES[currentSlide].description}
+                  {HERO_SLIDES[currentSlideIndex].description}
                 </motion.p>
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
+                  transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
                   className="flex flex-col sm:flex-row gap-4 justify-center"
                 >
                   <Button
@@ -104,14 +148,14 @@ export default function Home() {
                     className="h-12 md:h-14 px-8 text-sm md:text-base uppercase tracking-widest font-bold rounded-none bg-white text-black hover:bg-transparent hover:text-white border-2 border-white transition-colors duration-300"
                     asChild
                   >
-                    <Link href={HERO_SLIDES[currentSlide].buttonLeft.link}>{HERO_SLIDES[currentSlide].buttonLeft.label}</Link>
+                    <Link href={HERO_SLIDES[currentSlideIndex].buttonLeft.link}>{HERO_SLIDES[currentSlideIndex].buttonLeft.label}</Link>
                   </Button>
                   <Button
                     size="lg"
                     className="h-12 md:h-14 px-8 text-sm md:text-base uppercase tracking-widest font-bold rounded-none bg-transparent text-white border-2 border-white hover:bg-white hover:text-black transition-colors duration-300"
                     asChild
                   >
-                    <Link href={HERO_SLIDES[currentSlide].buttonRight.link}>{HERO_SLIDES[currentSlide].buttonRight.label}</Link>
+                    <Link href={HERO_SLIDES[currentSlideIndex].buttonRight.link}>{HERO_SLIDES[currentSlideIndex].buttonRight.label}</Link>
                   </Button>
                 </motion.div>
               </div>
@@ -124,8 +168,11 @@ export default function Home() {
           {HERO_SLIDES.map((_, idx) => (
             <button
               key={idx}
-              onClick={() => setCurrentSlide(idx)}
-              className={`h-1 transition-all duration-500 ${currentSlide === idx ? "w-12 bg-white" : "w-6 bg-white/40"}`}
+              onClick={() => {
+                const newDirection = idx > currentSlideIndex ? 1 : -1;
+                setPage([idx, newDirection]); 
+              }}
+              className={`h-1 transition-all duration-500 ${currentSlideIndex === idx ? "w-12 bg-white" : "w-6 bg-white/40"}`}
             />
           ))}
         </div>
