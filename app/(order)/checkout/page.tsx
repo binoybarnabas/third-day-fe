@@ -96,29 +96,12 @@ export default function Checkout() {
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2">
         {/* Left Column: Form */}
         <div className="p-6 md:p-12 lg:pr-24">
-          <div className="max-w-lg mx-auto lg:mr-0 lg:ml-auto">
-            <h2 className="text-lg font-bold uppercase tracking-wide mb-6">Contact Information</h2>
-
+          <div className="w-full max-w-2xl mx-auto lg:mr-0 lg:ml-auto">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field } : any) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="email@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Separator className="my-6" />
                 <h2 className="text-lg font-bold uppercase tracking-wide mb-6">Shipping Address</h2>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 w-full">
                   <FormField
                     control={form.control}
                     name="firstName"
@@ -126,7 +109,7 @@ export default function Checkout() {
                       <FormItem>
                         <FormLabel>First Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="John" {...field} />
+                          <Input className="h-12" placeholder="John" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -139,7 +122,7 @@ export default function Checkout() {
                       <FormItem>
                         <FormLabel>Last Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Doe" {...field} />
+                          <Input className="h-12" placeholder="Doe" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -154,14 +137,14 @@ export default function Checkout() {
                     <FormItem>
                       <FormLabel>Address</FormLabel>
                       <FormControl>
-                        <Input placeholder="123 Street Name" {...field} />
+                        <Input className="h-12" placeholder="123 Street Name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 w-full">
                   <FormField
                     control={form.control}
                     name="city"
@@ -169,7 +152,7 @@ export default function Checkout() {
                       <FormItem>
                         <FormLabel>City</FormLabel>
                         <FormControl>
-                          <Input placeholder="New York" {...field} />
+                          <Input className="h-12" placeholder="New York" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -182,7 +165,7 @@ export default function Checkout() {
                       <FormItem>
                         <FormLabel>ZIP Code</FormLabel>
                         <FormControl>
-                          <Input placeholder="10001" {...field} />
+                          <Input className="h-12" placeholder="10001" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -190,19 +173,38 @@ export default function Checkout() {
                   />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }: any) => (
-                    <FormItem>
-                      <FormLabel>Phone</FormLabel>
-                      <FormControl>
-                        <Input placeholder="+1 (555) 000-0000" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <Separator className="my-6" />
+                <h2 className="text-lg font-bold uppercase tracking-wide mb-6">Contact Information</h2>
+
+                <div className="grid grid-cols-1 gap-4 w-full">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field } : any) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input className="h-12" placeholder="email@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }: any) => (
+                      <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                          <Input className="h-12" placeholder="+1 (555) 000-0000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <Separator className="my-6" />
                 <h2 className="text-lg font-bold uppercase tracking-wide mb-6">Payment</h2>
