@@ -60,14 +60,15 @@ export default function AdminDashboard() {
 
     return (
         <AdminLayout>
-            <div className="p-6 space-y-8">
+            {/* Reduced padding on mobile (p-4 vs p-6) */}
+            <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                    <p className="text-muted-foreground">Real-time overview of your store performance.</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
+                    <p className="text-sm text-muted-foreground">Real-time overview of your store performance.</p>
                 </div>
 
-                {/* Stats Grid */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {/* Stats Grid: 1 column on mobile, 2 on tablet, 4 on desktop */}
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                     {statCards.map((stat) => (
                         <Card key={stat.title}>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -88,10 +89,13 @@ export default function AdminDashboard() {
                     ))}
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                    <Card className="col-span-4">
+                {/* Content Grid: Stacks vertically on mobile/tablet, side-by-side on large screens only */}
+                <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
+                    
+                    {/* Recent Orders Section */}
+                    <Card className="lg:col-span-4">
                         <CardHeader>
-                            <CardTitle>Recent Orders</CardTitle>
+                            <CardTitle className="text-lg">Recent Orders</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {ordersLoading ? (
@@ -99,17 +103,18 @@ export default function AdminDashboard() {
                                     {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
                                 </div>
                             ) : recentOrders.length > 0 ? (
-                                <div className="space-y-8">
+                                <div className="space-y-6 sm:space-y-8">
                                     {recentOrders.map((order: Order) => (
-                                        <div key={order.id} className="flex items-center">
-                                            <div className="space-y-1">
-                                                <p className="text-sm font-medium leading-none">
+                                        <div key={order.id} className="flex items-center gap-2">
+                                            <div className="space-y-1 min-w-0 flex-1">
+                                                <p className="text-sm font-medium leading-none truncate">
                                                     {order.firstName} {order.lastName}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">Order #{order.id}</p>
                                             </div>
-                                            <div className="ml-auto font-medium">${order.total}</div>
-                                            <div className={`ml-4 text-[10px] uppercase px-2 py-1 rounded-full font-bold ${
+                                            <div className="text-sm font-bold">${order.total}</div>
+                                            {/* Status Badge: Smaller text and padding on mobile */}
+                                            <div className={`text-[9px] sm:text-[10px] uppercase px-2 py-0.5 rounded-full font-bold whitespace-nowrap ${
                                                 order.status === "delivered" ? "bg-green-100 text-green-700" :
                                                 order.status === "shipped" ? "bg-blue-100 text-blue-700" :
                                                 "bg-yellow-100 text-yellow-700"
@@ -125,9 +130,10 @@ export default function AdminDashboard() {
                         </CardContent>
                     </Card>
                     
-                    <Card className="col-span-3">
+                    {/* Top Products Section */}
+                    <Card className="lg:col-span-3">
                         <CardHeader>
-                            <CardTitle>Top Products</CardTitle>
+                            <CardTitle className="text-lg">Top Products</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {productsLoading ? (
@@ -135,17 +141,17 @@ export default function AdminDashboard() {
                                     {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
                                 </div>
                             ) : (
-                                <div className="space-y-8">
+                                <div className="space-y-6 sm:space-y-8">
                                     {products.slice(0, 5).map((product: Product) => (
                                         <div key={product.id} className="flex items-center">
-                                            <div className="h-9 w-9 rounded bg-muted overflow-hidden">
+                                            <div className="h-9 w-9 rounded bg-muted overflow-hidden shrink-0">
                                                 <img src={product.images[0]} alt="" className="h-full w-full object-cover" />
                                             </div>
-                                            <div className="ml-4 space-y-1">
-                                                <p className="text-sm font-medium leading-none truncate w-[120px]">{product.title}</p>
-                                                <p className="text-xs text-muted-foreground uppercase">{product.category}</p>
+                                            <div className="ml-4 space-y-1 min-w-0 flex-1">
+                                                <p className="text-sm font-medium leading-none truncate">{product.title}</p>
+                                                <p className="text-[10px] text-muted-foreground uppercase">{product.category}</p>
                                             </div>
-                                            <div className="ml-auto font-medium">${parseFloat(product.price).toFixed(2)}</div>
+                                            <div className="ml-2 text-sm font-bold">${parseFloat(product.price).toFixed(2)}</div>
                                         </div>
                                     ))}
                                 </div>

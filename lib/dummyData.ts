@@ -782,3 +782,38 @@ export const FIRST_ORDER_COUPON = {
   discount: "15%",
   description: "Valid on your first purchase"
 };
+
+export const dummyCustomers = [
+  {
+    id: 101,
+    name: "Alexander Pierce",
+    email: "alex.pierce@example.com",
+    totalOrders: 12,
+    totalSpent: "1450.50",
+    lastOrderDate: "2026-01-20T10:00:00Z"
+  },
+  {
+    id: 102,
+    name: "Elena Rodriguez",
+    email: "elena.rod@lifestyle.io",
+    totalOrders: 5,
+    totalSpent: "620.00",
+    lastOrderDate: "2026-01-24T15:30:00Z"
+  },
+  {
+    id: 103,
+    name: "Marcus Thorne",
+    email: "m.thorne@techdrift.com",
+    totalOrders: 28,
+    totalSpent: "4890.75",
+    lastOrderDate: "2025-12-15T08:45:00Z"
+  },
+  {
+    id: 104,
+    name: "Sarah Jenkins",
+    email: "sarah.j@urbanwear.net",
+    totalOrders: 2,
+    totalSpent: "125.25",
+    lastOrderDate: "2026-01-10T11:20:00Z"
+  }
+];
