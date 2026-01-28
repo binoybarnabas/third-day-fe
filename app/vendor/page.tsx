@@ -24,7 +24,6 @@ export default function VendorDashboard() {
     queryFn: api.fetchVendorProducts,
   });
 
-  // Calculate top performing products (mock logic: just take first 5)
   const topProducts = products.slice(0, 5);
 
   const statCards = [
@@ -60,7 +59,8 @@ export default function VendorDashboard() {
 
   return (
     <VendorLayout>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      {/* Responsive Stats Grid: 1 col on mobile, 2 on tablet, 4 on desktop */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {statCards.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -85,8 +85,11 @@ export default function VendorDashboard() {
         ))}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
+      {/* Main Grid: Stacks vertically on mobile/tablet, side-by-side on lg screens */}
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
+        
+        {/* Recent Orders - Spans 4/7 of width on desktop */}
+        <Card className="lg:col-span-4">
           <CardHeader>
             <CardTitle>Recent Orders</CardTitle>
           </CardHeader>
@@ -98,14 +101,18 @@ export default function VendorDashboard() {
             ) : (
                 <div className="space-y-4">
                   {recentOrders.map((order) => (
-                    <div key={order.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium leading-none">Order #{order.id}</p>
+                    <div key={order.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0 gap-2">
+                      <div className="space-y-1 min-w-0">
+                        <p className="text-sm font-medium leading-none truncate">Order #{order.id}</p>
                         <p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleDateString()}</p>
                       </div>
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                          <div className="text-sm font-bold">${order.total}</div>
-                         <div className={`text-xs px-2 py-1 rounded-full ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                         <div className={`text-[10px] sm:text-xs px-2 py-1 rounded-full font-medium ${
+                           order.status === 'delivered' 
+                           ? 'bg-green-100 text-green-700' 
+                           : 'bg-yellow-100 text-yellow-700'
+                         }`}>
                            {order.status}
                          </div>
                       </div>
@@ -116,7 +123,8 @@ export default function VendorDashboard() {
           </CardContent>
         </Card>
         
-        <Card className="col-span-3">
+        {/* Top Products - Spans 3/7 of width on desktop */}
+        <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle>Top Performing Products</CardTitle>
           </CardHeader>
@@ -132,11 +140,13 @@ export default function VendorDashboard() {
                     <div className="h-10 w-10 rounded bg-secondary overflow-hidden shrink-0">
                       <img src={product.images[0] || "/placeholder.png"} alt={product.title} className="h-full w-full object-cover" />
                     </div>
-                    <div className="flex-1 overflow-hidden">
+                    <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{product.title}</p>
                       <p className="text-xs text-muted-foreground">${product.price}</p>
                     </div>
-                    <div className="text-xs font-bold text-green-600">High Demand</div>
+                    <div className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded shrink-0">
+                      Top Seller
+                    </div>
                   </div>
                 ))}
               </div>
