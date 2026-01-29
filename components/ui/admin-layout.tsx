@@ -10,10 +10,11 @@ import {
   Users,
   Package,
   LogOut,
-  Menu // Import Menu icon
+  Menu 
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/common/sheet";
 import { Button } from "@/components/common/button";
+import { APP_CONFIG } from "@/lib/constants";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const location = usePathname();
@@ -27,12 +28,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { icon: Users, label: "Customers", href: AppRoutes.ADMIN_CUSTOMERS },
   ];
 
+  const brandParts = APP_CONFIG.BRAND_NAME.split(" ");
+  const boldPart = brandParts.slice(0, 2).join(" ");
+  const lightPart = brandParts.slice(2).join(" ");
+
   // Reusable Sidebar Content
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-black text-white">
       <div className="p-6 border-b border-neutral-800">
-        <h1 className="text-xl font-heading font-bold uppercase tracking-tighter">
-          Street•Wear <span className="text-neutral-500 text-sm block font-sans normal-case tracking-normal">Admin Panel</span>
+        <h1 className="text-xl uppercase tracking-tighter leading-none">
+          <span className="font-black">{boldPart}</span>
+          <span className="font-light ml-1">{lightPart}</span>
         </h1>
       </div>
 
