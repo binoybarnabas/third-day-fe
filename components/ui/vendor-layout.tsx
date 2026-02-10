@@ -14,6 +14,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/common/sheet";
 import { Button } from "@/components/common/button";
 import { APP_CONFIG } from "@/lib/constants";
+import { PageLoader } from "../common/page-loader";
 
 export function VendorLayout({ children }: { children: React.ReactNode }) {
   const location = usePathname();

@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import * as api from "@/lib/api";
 import Link from "next/link";
 import { Button } from "@/components/common/button";
+import { PageLoader } from "@/components/common/page-loader";
 
 export default function VendorDashboard() {
 
@@ -61,6 +62,7 @@ export default function VendorDashboard() {
     <VendorLayout>
       {/* Responsive Stats Grid: 1 col on mobile, 2 on tablet, 4 on desktop */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <PageLoader />
         {statCards.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

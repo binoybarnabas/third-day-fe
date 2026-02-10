@@ -10,6 +10,7 @@ import {  User, Store, Mail, MapPin, Phone, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import * as api from "@/lib/api";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { PageLoader } from "@/components/common/page-loader";
 
 export default function VendorSettingsPage() {
   const { data: profile, isLoading: isFetching } = useQuery({
@@ -66,6 +67,7 @@ export default function VendorSettingsPage() {
   return (
     <VendorLayout>
       <div className="mb-6">
+        <PageLoader />
         <h1 className="text-2xl font-heading font-bold uppercase tracking-tight">Settings</h1>
         <p className="text-muted-foreground text-sm">Manage your profile and store preferences</p>
       </div>

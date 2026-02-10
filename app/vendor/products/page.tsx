@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/common/select";
 import { toast } from "sonner";
+import { PageLoader } from "@/components/common/page-loader";
 
 export default function VendorProductsPage() {
   const queryClient = useQueryClient();
@@ -56,6 +57,7 @@ export default function VendorProductsPage() {
     <VendorLayout>
       {/* Responsive Header: Stacks on mobile, side-by-side on tablet+ */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <PageLoader />
         <div>
           <h1 className="text-xl sm:text-2xl font-heading font-bold uppercase tracking-tight">My Products</h1>
           <p className="text-muted-foreground text-sm">Manage your product catalog</p>
